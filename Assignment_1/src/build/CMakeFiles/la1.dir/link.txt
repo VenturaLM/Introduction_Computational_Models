@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/la1.dir/la1.cpp.o CMakeFiles/la1.dir/imc/MultilayerPerceptron.cpp.o  -o la1 
