@@ -1,0 +1,3 @@
+/home/elon-musk-tweet/Escritorio/IMC/Assignment_1/src/build/CMakeFiles/rebuild_cache.dir
+/home/elon-musk-tweet/Escritorio/IMC/Assignment_1/src/build/CMakeFiles/edit_cache.dir
+/home/elon-musk-tweet/Escritorio/IMC/Assignment_1/src/build/CMakeFiles/la1.dir
