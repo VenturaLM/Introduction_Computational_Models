@@ -25,7 +25,12 @@ using namespace util;
 // Constructor: Default values for all the parameters
 MultilayerPerceptron::MultilayerPerceptron()
 {
-
+	this->nOfLayers = 0;
+	this->layers = nullptr;
+	this->eta = 0.1;
+	this->mu = 0.9;
+	this->validationRatio = 0.0;
+	this->decrementFactor = 1.0;
 }
 
 // ------------------------------
@@ -33,6 +38,25 @@ MultilayerPerceptron::MultilayerPerceptron()
 // nl is the number of layers and npl is a vetor containing the number of neurons in every layer
 // Give values to Layer* layers
 int MultilayerPerceptron::initialize(int nl, int npl[]) {
+	
+	// Create the layers.
+	this->nOfLayers = nl;
+	this->layers = new Layer[this->nOfLayers];
+
+
+	for (auto i = 0; i < this->nOfLayers; i++)
+	{
+		layers[i].neurons = new Neuron[npl[i]];
+	}
+	
+
+	// Check if layers is NULL.
+
+	// Initialize the layers.
+
+
+
+
 	return 1;
 }
 
@@ -145,7 +169,7 @@ Dataset* MultilayerPerceptron::readData(const char *fileName) {
 	int i,j;
 
 
-	if( myFile.good()) {
+	if(myFile.good()) {
 		getline(myFile,line);   // Read a line
 		istringstream iss(line);
 		iss >> dataset->nOfInputs;
