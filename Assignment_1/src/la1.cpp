@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
         // Initialize topology vector
     	int layers = 1; // This should be corrected: for instance = 1
-    	int * topology = NULL; // This should be corrected
+    	int * topology = NULL; // This should be corrected: topology[0] = 19 - topology[i] = h (parametro por linea de argumentos) - topology[n+2] = 2
 
         // TODO: Initialize the network using the topology vector - PARA ELLO, INICIALIZAR LA VARIABLE TOPOLOGY
         mlp.initialize(layers+2,topology);
