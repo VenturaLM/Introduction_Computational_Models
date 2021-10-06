@@ -45,12 +45,14 @@ int MultilayerPerceptron::initialize(int nl, int npl[]) {
 
 
 	for (auto i = 0; i < this->nOfLayers; i++)
-	{
-		layers[i].neurons = new Neuron[npl[i]];
-	}
+		this->layers[i].neurons = new Neuron[npl[i]];
 	
 
 	// Check if layers is NULL.
+	for (auto i = 0; i < this->nOfLayers; i++)
+		if (this->layers == nullptr)
+			perror("Value of layers: nullptr.");
+	
 
 	// Initialize the layers.
 
@@ -108,7 +110,11 @@ void MultilayerPerceptron::restoreWeights() {
 // ------------------------------
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
 void MultilayerPerceptron::forwardPropagate() {
-	
+	// From the first leayer...
+		// For every neuron
+			// Obtain the input wighted average
+
+			// Apply the activation function (sigmoid, for instance)
 }
 
 // ------------------------------
@@ -155,7 +161,7 @@ void MultilayerPerceptron::performEpochOnline(double* input, double* target) {
 Dataset* MultilayerPerceptron::readData(const char *fileName) {
 
 	ifstream myFile(fileName);    // Create an input stream
-
+	
     if (!myFile.is_open()) {
        cout << "ERROR: I cannot open the file " << fileName << endl;
        return NULL;

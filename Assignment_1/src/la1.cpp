@@ -6,7 +6,7 @@
 // Copyright   : Universidad de Córdoba
 //============================================================================
 
-// Example execution:   ./la1 -t ../train_xor.dat -T ../test_xor.dat -i 1000 -l 1 -h 10 -e 0.1 -m 0.9 -v 0.0 -d 1.0
+// Example execution:   ./la1 -T ../../datasets/dat/test_xor.dat -t ../../datasets/dat/train_xor.dat  -i 1000 -l 1 -h 10 -e 0.1 -m 0.9 -v 0.0 -d 1.0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +16,7 @@
 #include <cstdlib>  // To establish the seed srand() and generate pseudorandom numbers rand()
 #include <string.h>
 #include <math.h>
+#include <cstring>
 
 #include "imc/MultilayerPerceptron.h"
 
@@ -25,15 +26,15 @@ using namespace std;
 
 int main(int argc, char **argv) {
     // Process arguments of the command line
-    bool Tflag = 0, wflag = 0, pflag = 0;
-    char *Tvalue = NULL, *wvalue = NULL;
+    bool Tflag = 0, wflag = 0, pflag = 0, tflag = 0;
+    char *Tvalue = NULL, *wvalue = NULL, *tvalue = NULL;
     int c;
 
     opterr = 0;
 
     // a: Option that requires an argument
     // a:: The argument required is optional
-    while ((c = getopt(argc, argv, "T:w:p")) != -1)
+    while ((c = getopt(argc, argv, "T:w:p:t:")) != -1)
     {
         // The parameters needed for using the optional prediction mode of Kaggle have been included.
         // You should add the rest of parameters needed for the lab assignment.
@@ -41,6 +42,10 @@ int main(int argc, char **argv) {
             case 'T':
                 Tflag = true;
                 Tvalue = optarg;
+                break;
+            case 't':
+                tflag = true;
+                tvalue = optarg;
                 break;
             case 'w':
                 wflag = true;
@@ -50,7 +55,7 @@ int main(int argc, char **argv) {
                 pflag = true;
                 break;
             case '?':
-                if (optopt == 'T' || optopt == 'w' || optopt == 'p')
+                if (optopt == 'T' || optopt == 'w' || optopt == 'p' || optopt == 't')
                     fprintf (stderr, "The option -%c requires an argument.\n", optopt);
                 else if (isprint (optopt))
                     fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -64,6 +69,7 @@ int main(int argc, char **argv) {
         }
     }
 
+    // pflag --> Flag indicating that the program is running in prediction mode.
     if (!pflag) {
         //////////////////////////////////
         // TRAINING AND EVALUATION MODE //
@@ -73,19 +79,18 @@ int main(int argc, char **argv) {
     	MultilayerPerceptron mlp;
 
         // Parameters of the mlp. For example, mlp.eta = value;
-    	int iterations = -1; // This should be corrected: for instance 50
+    	int iterations = 500; // This should be corrected: for instance = 500
 
         // Read training and test data: call to mlp.readData(...)
-    	Dataset * trainDataset = NULL; // This should be corrected
-    	Dataset * testDataset = NULL; // This should be corrected
+    	Dataset * trainDataset = mlp.readData(tvalue); // This should be corrected
+    	Dataset * testDataset = mlp.readData(Tvalue); // This should be corrected
 
         // Initialize topology vector
-    	int layers=-1; // This should be corrected
-    	int * topology=NULL; // This should be corrected
+    	int layers = 1; // This should be corrected: for instance = 1
+    	int * topology = NULL; // This should be corrected
 
-        // Initialize the network using the topology vector
+        // TODO: Initialize the network using the topology vector - PARA ELLO, INICIALIZAR LA VARIABLE TOPOLOGY
         mlp.initialize(layers+2,topology);
-
 
         // Seed for random numbers
         int seeds[] = {1,2,3,4,5};
