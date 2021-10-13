@@ -3,16 +3,10 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++ compilar archivo activo",
-            "command": "/usr/bin/g++",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
-            ],
+            "command": "make",
+            "args": [],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${fileDirname}/build"
             },
             "problemMatcher": [
                 "$gcc"

@@ -6,7 +6,7 @@
 // Copyright   : Universidad de Córdoba
 //============================================================================
 
-// Example execution:   ./la1 -T ../../datasets/dat/test_xor.dat -t ../../datasets/dat/train_xor.dat  -i 1000 -l 1 -h 10 -e 0.1 -m 0.9 -v 0.0 -d 1.0
+// Example execution:   ./la1 -T ../../datasets/dat/test_parkinsons.dat -t ../../datasets/dat/train_parkinsons.dat  -i 1000 -l 1 -h 10 -e 0.1 -m 0.9 -v 0.0 -d 1.0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 
     // a: Option that requires an argument
     // a:: The argument required is optional
-    while ((c = getopt(argc, argv, "T:w:p:t:i::l::h::e::m::")) != -1)
+    while ((c = getopt(argc, argv, "T:w:p:t:i:l:h:e:m:")) != -1)
     {
         // The parameters needed for using the optional prediction mode of Kaggle have been included.
         // You should add the rest of parameters needed for the lab assignment.
@@ -100,23 +100,27 @@ int main(int argc, char **argv) {
 
         // Parameters of the mlp. For example, mlp.eta = value;
     	int iterations = 1000;
-        if(iflag != false)
+        if(iflag)
             iterations = stoi(ivalue);
 
         // Read training and test data: call to mlp.readData(...)
     	Dataset * trainDataset = mlp.readData(tvalue);
     	Dataset * testDataset = mlp.readData(Tvalue);
 
+        cout << trainDataset->nOfInputs << endl;
+        cout << trainDataset->nOfOutputs << endl;
         // Initialize topology vector
     	int layers = 1;
-    	if(lflag != false)
+    	if(lflag)
             layers = stoi(lvalue);
         
-        int *topology = NULL; //topology[0] = 19 - topology[i] = h (parametro por linea de argumentos) - topology[n+2] = 2
+        //topology[0] = 19 - topology[i] = h (parametro por linea de argumentos) - topology[n+2] = 2
+        int topology_length = trainDataset->nOfInputs + trainDataset->nOfOutputs + stoi(hvalue);
+        int *topology = new int[3];
 
         // TODO: Initialize the network using the topology vector - PARA ELLO, INICIALIZAR LA VARIABLE TOPOLOGY
         mlp.initialize(layers+2,topology);
-
+        
         // Seed for random numbers
         int seeds[] = {1,2,3,4,5};
         double *testErrors = new double[5];

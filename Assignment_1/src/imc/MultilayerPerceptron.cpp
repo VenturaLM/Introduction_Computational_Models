@@ -43,9 +43,30 @@ int MultilayerPerceptron::initialize(int nl, int npl[]) {
 	this->nOfLayers = nl;
 	this->layers = new Layer[this->nOfLayers];
 
+	// First layer.
+	this->layers[0].neurons = new Neuron[npl[0]];
+	this->layers[0].nOfNeurons = npl[0];
+	// No hace falta porque detrás no tienen nada.
+	//-------
 
-	for (auto i = 0; i < this->nOfLayers; i++)
+	// Last layer,
+	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
+	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
+	// Falta hacer lo mismo que en el segundo for.
+
+	// Middle layers.
+	for (auto i = 1; i < this->nOfLayers - 2; i++)
+	{
 		this->layers[i].neurons = new Neuron[npl[i]];
+		this->layers[i].nOfNeurons = npl[i];
+
+		for (auto j = 0; j < layers[i].nOfNeurons; j++)
+		{
+			//Reservar para los vectores de los elementos de cada neurona.
+		}
+		
+	}
+
 	
 
 	// Check if layers is NULL.
@@ -55,7 +76,6 @@ int MultilayerPerceptron::initialize(int nl, int npl[]) {
 	
 
 	// Initialize the layers.
-
 
 
 
