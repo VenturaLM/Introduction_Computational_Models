@@ -7,15 +7,13 @@
 
 #include "util.h"
 
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <cstdlib>  // To establish the seed srand() and generate pseudorandom numbers rand()
+#include <cstdlib> // To establish the seed srand() and generate pseudorandom numbers rand()
 #include <limits>
 #include <math.h>
-
 
 using namespace imc;
 using namespace std;
@@ -37,8 +35,9 @@ MultilayerPerceptron::MultilayerPerceptron()
 // Allocate memory for the data structures
 // nl is the number of layers and npl is a vetor containing the number of neurons in every layer
 // Give values to Layer* layers
-int MultilayerPerceptron::initialize(int nl, int npl[]) {
-	
+int MultilayerPerceptron::initialize(int nl, int npl[])
+{
+
 	// Create the layers.
 	this->nOfLayers = nl;
 	this->layers = new Layer[this->nOfLayers];
@@ -63,169 +62,172 @@ int MultilayerPerceptron::initialize(int nl, int npl[]) {
 		for (auto j = 0; j < layers[i].nOfNeurons; j++)
 		{
 			//Reservar para los vectores de los elementos de cada neurona.
+			layers[i].neurons[j].w = nullptr;
+			layers[i].neurons[j].deltaW = nullptr;
+			layers[i].neurons[j].lastDeltaW = nullptr;
+			layers[i].neurons[j].wCopy = nullptr;
 		}
-		
 	}
-
-	
 
 	// Check if layers is NULL.
 	for (auto i = 0; i < this->nOfLayers; i++)
 		if (this->layers == nullptr)
 			perror("Value of layers: nullptr.");
-	
 
 	// Initialize the layers.
-
-
 
 	return 1;
 }
 
-
 // ------------------------------
 // DESTRUCTOR: free memory
-MultilayerPerceptron::~MultilayerPerceptron() {
+MultilayerPerceptron::~MultilayerPerceptron()
+{
 	freeMemory();
 }
 
-
 // ------------------------------
 // Free memory for the data structures
-void MultilayerPerceptron::freeMemory() {
-
+void MultilayerPerceptron::freeMemory()
+{
 }
 
 // ------------------------------
 // Feel all the weights (w) with random numbers between -1 and +1
-void MultilayerPerceptron::randomWeights() {
-
+void MultilayerPerceptron::randomWeights()
+{
 }
 
 // ------------------------------
 // Feed the input neurons of the network with a vector passed as an argument
-void MultilayerPerceptron::feedInputs(double* input) {
-
+void MultilayerPerceptron::feedInputs(double *input)
+{
 }
 
 // ------------------------------
 // Get the outputs predicted by the network (out vector the output layer) and save them in the vector passed as an argument
-void MultilayerPerceptron::getOutputs(double* output)
+void MultilayerPerceptron::getOutputs(double *output)
 {
-
 }
 
 // ------------------------------
 // Make a copy of all the weights (copy w in wCopy)
-void MultilayerPerceptron::copyWeights() {
-
+void MultilayerPerceptron::copyWeights()
+{
 }
 
 // ------------------------------
 // Restore a copy of all the weights (copy wCopy in w)
-void MultilayerPerceptron::restoreWeights() {
-
+void MultilayerPerceptron::restoreWeights()
+{
 }
 
 // ------------------------------
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
-void MultilayerPerceptron::forwardPropagate() {
+void MultilayerPerceptron::forwardPropagate()
+{
 	// From the first leayer...
-		// For every neuron
-			// Obtain the input wighted average
+	// For every neuron
+	// Obtain the input wighted average
 
-			// Apply the activation function (sigmoid, for instance)
+	// Apply the activation function (sigmoid, for instance)
 }
 
 // ------------------------------
 // Obtain the output error (MSE) of the out vector of the output layer wrt a target vector and return it
-double MultilayerPerceptron::obtainError(double* target) {
+double MultilayerPerceptron::obtainError(double *target)
+{
 	return -1;
 }
 
-
 // ------------------------------
 // Backpropagate the output error wrt a vector passed as an argument, from the last layer to the first one <--<--
-void MultilayerPerceptron::backpropagateError(double* target) {
-	
+void MultilayerPerceptron::backpropagateError(double *target)
+{
 }
-
 
 // ------------------------------
 // Accumulate the changes produced by one pattern and save them in deltaW
-void MultilayerPerceptron::accumulateChange() {
-
+void MultilayerPerceptron::accumulateChange()
+{
 }
 
 // ------------------------------
 // Update the network weights, from the first layer to the last one
-void MultilayerPerceptron::weightAdjustment() {
-
-
+void MultilayerPerceptron::weightAdjustment()
+{
 }
 
 // ------------------------------
 // Print the network, i.e. all the weight matrices
-void MultilayerPerceptron::printNetwork() {
+void MultilayerPerceptron::printNetwork()
+{
 }
 
 // ------------------------------
 // Perform an epoch: forward propagate the inputs, backpropagate the error and adjust the weights
 // input is the input vector of the pattern and target is the desired output vector of the pattern
-void MultilayerPerceptron::performEpochOnline(double* input, double* target) {
-
+void MultilayerPerceptron::performEpochOnline(double *input, double *target)
+{
 }
 
 // ------------------------------
 // Read a dataset from a file name and return it
-Dataset* MultilayerPerceptron::readData(const char *fileName) {
+Dataset *MultilayerPerceptron::readData(const char *fileName)
+{
 
-	ifstream myFile(fileName);    // Create an input stream
-	
-    if (!myFile.is_open()) {
-       cout << "ERROR: I cannot open the file " << fileName << endl;
-       return NULL;
-    }
+	ifstream myFile(fileName); // Create an input stream
 
-	Dataset * dataset = new Dataset;
-	if(dataset==NULL)
+	if (!myFile.is_open())
+	{
+		cout << "ERROR: I cannot open the file " << fileName << endl;
+		return NULL;
+	}
+
+	Dataset *dataset = new Dataset;
+	if (dataset == NULL)
 		return NULL;
 
 	string line;
-	int i,j;
+	int i, j;
 
-
-	if(myFile.good()) {
-		getline(myFile,line);   // Read a line
+	if (myFile.good())
+	{
+		getline(myFile, line); // Read a line
 		istringstream iss(line);
 		iss >> dataset->nOfInputs;
 		iss >> dataset->nOfOutputs;
 		iss >> dataset->nOfPatterns;
 	}
-	dataset->inputs = new double*[dataset->nOfPatterns];
-	dataset->outputs = new double*[dataset->nOfPatterns];
+	dataset->inputs = new double *[dataset->nOfPatterns];
+	dataset->outputs = new double *[dataset->nOfPatterns];
 
-	for(i=0; i<dataset->nOfPatterns; i++){
+	for (i = 0; i < dataset->nOfPatterns; i++)
+	{
 		dataset->inputs[i] = new double[dataset->nOfInputs];
 		dataset->outputs[i] = new double[dataset->nOfOutputs];
 	}
 
-	i=0;
-	while ( myFile.good()) {
-		getline(myFile,line);   // Read a line
-		if (! line.empty()) {
+	i = 0;
+	while (myFile.good())
+	{
+		getline(myFile, line); // Read a line
+		if (!line.empty())
+		{
 			istringstream iss(line);
-			for(j=0; j< dataset->nOfInputs; j++){
+			for (j = 0; j < dataset->nOfInputs; j++)
+			{
 				double value;
 				iss >> value;
-				if(!iss)
+				if (!iss)
 					return NULL;
 				dataset->inputs[i][j] = value;
 			}
-			for(j=0; j< dataset->nOfOutputs; j++){
+			for (j = 0; j < dataset->nOfOutputs; j++)
+			{
 				double value;
 				iss >> value;
-				if(!iss)
+				if (!iss)
 					return NULL;
 				dataset->outputs[i][j] = value;
 			}
@@ -240,44 +242,46 @@ Dataset* MultilayerPerceptron::readData(const char *fileName) {
 
 // ------------------------------
 // Perform an online training for a specific trainDataset
-void MultilayerPerceptron::trainOnline(Dataset* trainDataset) {
+void MultilayerPerceptron::trainOnline(Dataset *trainDataset)
+{
 	int i;
-	for(i=0; i<trainDataset->nOfPatterns; i++){
+	for (i = 0; i < trainDataset->nOfPatterns; i++)
+	{
 		performEpochOnline(trainDataset->inputs[i], trainDataset->outputs[i]);
 	}
 }
 
 // ------------------------------
 // Test the network with a dataset and return the MSE
-double MultilayerPerceptron::test(Dataset* testDataset) {
+double MultilayerPerceptron::test(Dataset *testDataset)
+{
 	return -1.0;
 }
-
 
 // Optional - KAGGLE
 // Test the network with a dataset and return the MSE
 // Your have to use the format from Kaggle: two columns (Id y predictied)
-void MultilayerPerceptron::predict(Dataset* pDatosTest)
+void MultilayerPerceptron::predict(Dataset *pDatosTest)
 {
 	int i;
 	int j;
-	int numSalidas = layers[nOfLayers-1].nOfNeurons;
-	double * obtained = new double[numSalidas];
-	
+	int numSalidas = layers[nOfLayers - 1].nOfNeurons;
+	double *obtained = new double[numSalidas];
+
 	cout << "Id,Predicted" << endl;
-	
-	for (i=0; i<pDatosTest->nOfPatterns; i++){
+
+	for (i = 0; i < pDatosTest->nOfPatterns; i++)
+	{
 
 		feedInputs(pDatosTest->inputs[i]);
 		forwardPropagate();
 		getOutputs(obtained);
-		
+
 		cout << i;
 
 		for (j = 0; j < numSalidas; j++)
 			cout << "," << obtained[j];
 		cout << endl;
-
 	}
 }
 
@@ -285,7 +289,7 @@ void MultilayerPerceptron::predict(Dataset* pDatosTest)
 // Run the traning algorithm for a given number of epochs, using trainDataset
 // Once finished, check the performance of the network in testDataset
 // Both training and test MSEs should be obtained and stored in errorTrain and errorTest
-void MultilayerPerceptron::runOnlineBackPropagation(Dataset * trainDataset, Dataset * pDatosTest, int maxiter, double *errorTrain, double *errorTest)
+void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Dataset *pDatosTest, int maxiter, double *errorTrain, double *errorTest)
 {
 	int countTrain = 0;
 
@@ -299,32 +303,34 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset * trainDataset, Data
 	double validationError = 1;
 
 	// Generate validation data
-	if(validationRatio > 0 && validationRatio < 1){
+	if (validationRatio > 0 && validationRatio < 1)
+	{
 		// .......
 	}
 
-
 	// Learning
-	do {
+	do
+	{
 
 		trainOnline(trainDataset);
 		double trainError = test(trainDataset);
-		if(countTrain==0 || trainError < minTrainError){
+		if (countTrain == 0 || trainError < minTrainError)
+		{
 			minTrainError = trainError;
 			copyWeights();
 			iterWithoutImproving = 0;
 		}
-		else if( (trainError-minTrainError) < 0.00001)
+		else if ((trainError - minTrainError) < 0.00001)
 			iterWithoutImproving = 0;
 		else
 			iterWithoutImproving++;
 
-		if(iterWithoutImproving==50){
-			cout << "We exit because the training is not improving!!"<< endl;
+		if (iterWithoutImproving == 50)
+		{
+			cout << "We exit because the training is not improving!!" << endl;
 			restoreWeights();
 			countTrain = maxiter;
 		}
-
 
 		countTrain++;
 
@@ -335,7 +341,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset * trainDataset, Data
 
 		cout << "Iteration " << countTrain << "\t Training error: " << trainError << "\t Validation error: " << validationError << endl;
 
-	} while ( countTrain<maxiter );
+	} while (countTrain < maxiter);
 
 	cout << "NETWORK WEIGHTS" << endl;
 	cout << "===============" << endl;
@@ -343,62 +349,59 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset * trainDataset, Data
 
 	cout << "Desired output Vs Obtained output (test)" << endl;
 	cout << "=========================================" << endl;
-	for(int i=0; i<pDatosTest->nOfPatterns; i++){
-		double* prediction = new double[pDatosTest->nOfOutputs];
+	for (int i = 0; i < pDatosTest->nOfPatterns; i++)
+	{
+		double *prediction = new double[pDatosTest->nOfOutputs];
 
 		// Feed the inputs and propagate the values
 		feedInputs(pDatosTest->inputs[i]);
 		forwardPropagate();
 		getOutputs(prediction);
-		for(int j=0; j<pDatosTest->nOfOutputs; j++)
+		for (int j = 0; j < pDatosTest->nOfOutputs; j++)
 			cout << pDatosTest->outputs[i][j] << " -- " << prediction[j] << " ";
 		cout << endl;
 		delete[] prediction;
-
 	}
 
 	testError = test(pDatosTest);
-	*errorTest=testError;
-	*errorTrain=minTrainError;
-
+	*errorTest = testError;
+	*errorTrain = minTrainError;
 }
 
 // Optional Kaggle: Save the model weights in a textfile
-bool MultilayerPerceptron::saveWeights(const char * archivo)
+bool MultilayerPerceptron::saveWeights(const char *archivo)
 {
 	// Object for writing the file
 	ofstream f(archivo);
 
-	if(!f.is_open())
+	if (!f.is_open())
 		return false;
 
 	// Write the number of layers and the number of layers in every layer
 	f << nOfLayers;
 
-	for(int i = 0; i < nOfLayers; i++)
+	for (int i = 0; i < nOfLayers; i++)
 		f << " " << layers[i].nOfNeurons;
 	f << endl;
 
 	// Write the weight matrix of every layer
-	for(int i = 1; i < nOfLayers; i++)
-		for(int j = 0; j < layers[i].nOfNeurons; j++)
-			for(int k = 0; k < layers[i-1].nOfNeurons + 1; k++)
+	for (int i = 1; i < nOfLayers; i++)
+		for (int j = 0; j < layers[i].nOfNeurons; j++)
+			for (int k = 0; k < layers[i - 1].nOfNeurons + 1; k++)
 				f << layers[i].neurons[j].w[k] << " ";
 
 	f.close();
 
 	return true;
-
 }
 
-
 // Optional Kaggle: Load the model weights from a textfile
-bool MultilayerPerceptron::readWeights(const char * archivo)
+bool MultilayerPerceptron::readWeights(const char *archivo)
 {
 	// Object for reading a file
 	ifstream f(archivo);
 
-	if(!f.is_open())
+	if (!f.is_open())
 		return false;
 
 	// Number of layers and number of neurons in every layer
@@ -411,16 +414,16 @@ bool MultilayerPerceptron::readWeights(const char * archivo)
 	npl = new int[nl];
 
 	// Read number of neurons in every layer
-	for(int i = 0; i < nl; i++)
+	for (int i = 0; i < nl; i++)
 		f >> npl[i];
 
 	// Initialize vectors and data structures
 	initialize(nl, npl);
 
 	// Read weights
-	for(int i = 1; i < nOfLayers; i++)
-		for(int j = 0; j < layers[i].nOfNeurons; j++)
-			for(int k = 0; k < layers[i-1].nOfNeurons + 1; k++)
+	for (int i = 1; i < nOfLayers; i++)
+		for (int j = 0; j < layers[i].nOfNeurons; j++)
+			for (int k = 0; k < layers[i - 1].nOfNeurons + 1; k++)
 				f >> layers[i].neurons[j].w[k];
 
 	f.close();
