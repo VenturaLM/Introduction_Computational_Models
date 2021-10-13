@@ -37,21 +37,17 @@ MultilayerPerceptron::MultilayerPerceptron()
 // Give values to Layer* layers
 int MultilayerPerceptron::initialize(int nl, int npl[])
 {
-
 	// Create the layers.
 	this->nOfLayers = nl;
 	this->layers = new Layer[this->nOfLayers];
+
+	//--------------------------------------------------------------------------------
 
 	// First layer.
 	this->layers[0].neurons = new Neuron[npl[0]];
 	this->layers[0].nOfNeurons = npl[0];
 	// No hace falta porque detrás no tienen nada.
 	//-------
-
-	// Last layer,
-	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
-	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
-	// Falta hacer lo mismo que en el segundo for.
 
 	// Middle layers.
 	for (auto i = 1; i < this->nOfLayers - 2; i++)
@@ -68,6 +64,17 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 			layers[i].neurons[j].wCopy = nullptr;
 		}
 	}
+
+	// Last layer,
+	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
+	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
+
+	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].w = nullptr;
+	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].deltaW = nullptr;
+	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].lastDeltaW = nullptr;
+	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].wCopy = nullptr;
+
+	//--------------------------------------------------------------------------------
 
 	// Check if layers is NULL.
 	for (auto i = 0; i < this->nOfLayers; i++)
