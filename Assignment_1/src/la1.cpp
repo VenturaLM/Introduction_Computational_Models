@@ -6,7 +6,7 @@
 // Copyright   : Universidad de Córdoba
 //============================================================================
 
-// Example execution:   ./la1 -T ../../datasets/dat/test_parkinsons.dat -t ../../datasets/dat/train_parkinsons.dat  -i 1000 -l 1 -h 10 -e 0.1 -m 0.9 -v 0.0 -d 1.0
+// Example execution:   ./la1 -T ../datasets/dat/test_parkinsons.dat -t ../datasets/dat/train_parkinsons.dat  -i 1000 -l 1 -h 10 -e 0.1 -m 0.9 -v 0.0 -d 1.0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,9 +114,9 @@ int main(int argc, char **argv)
         if (lflag)
             layers = stoi(lvalue);
 
+        // Topology:
         int *topology = new int[3];
 
-        // Topology:
         if (hflag)
         {
             int h = stoi(hvalue);
