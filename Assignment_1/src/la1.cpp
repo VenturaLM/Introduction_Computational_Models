@@ -114,9 +114,18 @@ int main(int argc, char **argv)
         if (lflag)
             layers = stoi(lvalue);
 
-        //topology[0] = 19 - topology[i] = h (parametro por linea de argumentos) - topology[n+2] = 2
+        //topology[0] = 19 - topology[l] = h (parametro por linea de argumentos) - topology[l + 2] = 2
         int topology_length = trainDataset->nOfInputs + trainDataset->nOfOutputs + stoi(hvalue);
         int *topology = new int[3];
+
+        if (hflag)
+        {
+            int h = stoi(hvalue);
+            topology[0] = trainDataset->nOfInputs;
+            for (auto i = 1; i < layers - 1; i++)
+                topology[i] = h;
+            topology[layers + 2] = trainDataset->nOfOutputs;
+        }
 
         // TODO: Initialize the network using the topology vector - PARA ELLO, INICIALIZAR LA VARIABLE TOPOLOGY
         mlp.initialize(layers + 2, topology);

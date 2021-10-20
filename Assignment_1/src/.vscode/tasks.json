@@ -3,10 +3,10 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++ compilar archivo activo",
-            "command": "make",
+            "command": "g++ la1.cpp imc/MultilayerPerceptron.cpp -o la1 -g",
             "args": [],
             "options": {
-                "cwd": "${fileDirname}/build"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"

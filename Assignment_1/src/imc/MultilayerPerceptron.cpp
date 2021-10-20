@@ -46,7 +46,6 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 	// First layer.
 	this->layers[0].neurons = new Neuron[npl[0]];
 	this->layers[0].nOfNeurons = npl[0];
-	// No hace falta porque detrás no tienen nada.
 	//-------
 
 	// Middle layers.
@@ -57,11 +56,11 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 
 		for (auto j = 0; j < layers[i].nOfNeurons; j++)
 		{
-			//Reservar para los vectores de los elementos de cada neurona.
-			layers[i].neurons[j].w = nullptr;
-			layers[i].neurons[j].deltaW = nullptr;
-			layers[i].neurons[j].lastDeltaW = nullptr;
-			layers[i].neurons[j].wCopy = nullptr;
+			// Allocation for each component of each neuron.
+			this->layers[i].neurons[j].w = new double[layers[i - 1].nOfNeurons + 1];
+			this->layers[i].neurons[j].deltaW = 0;
+			this->layers[i].neurons[j].lastDeltaW = 0;
+			this->layers[i].neurons[j].wCopy =  new double[layers[i - 1].nOfNeurons + 1];
 		}
 	}
 
@@ -69,10 +68,10 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
 	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
 
-	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].w = nullptr;
-	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].deltaW = nullptr;
-	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].lastDeltaW = nullptr;
-	layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].wCopy = nullptr;
+	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].w = new double[layers[this->nOfLayers - 2].nOfNeurons + 1];
+	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].deltaW = 0;
+	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].lastDeltaW = 0;
+	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].wCopy = new double[layers[this->nOfLayers - 2].nOfNeurons + 1];
 
 	//--------------------------------------------------------------------------------
 
@@ -100,9 +99,10 @@ void MultilayerPerceptron::freeMemory()
 }
 
 // ------------------------------
-// Feel all the weights (w) with random numbers between -1 and +1
+// Feed all the weights (w) with random numbers between -1 and +1
 void MultilayerPerceptron::randomWeights()
 {
+	// ((double)rand() / RAND_MAX) * (b - a) + a; --> (a < b)
 }
 
 // ------------------------------
