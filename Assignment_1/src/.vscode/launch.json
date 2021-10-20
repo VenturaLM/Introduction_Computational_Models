@@ -8,7 +8,7 @@
             "name": "g++ - Compilar y depurar el archivo activo",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/la1",
+            "program": "${workspaceFolder}//la1",
             "args": [
                 "-T",
                 "../datasets/dat/test_parkinsons.dat",
