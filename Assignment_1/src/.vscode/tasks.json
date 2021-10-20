@@ -2,8 +2,8 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++ compilar archivo activo",
-            "command": "g++ la1.cpp imc/MultilayerPerceptron.cpp -o la1 -g",
+            "label": "Multilayer Perceptron",
+            "command": "make",
             "args": [],
             "options": {
                 "cwd": "${fileDirname}"
@@ -15,7 +15,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Tarea generada por el depurador."
+            "detail": "Compiling..."
         }
     ],
     "version": "2.0.0"

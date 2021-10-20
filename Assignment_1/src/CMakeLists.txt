@@ -7,6 +7,7 @@ project(la1 VERSION 1.0)
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 # Required for UCO Thinstation. May not be required in your own PC.
 OPTION(THINSTATION	"Set to OFF at home" OFF)
