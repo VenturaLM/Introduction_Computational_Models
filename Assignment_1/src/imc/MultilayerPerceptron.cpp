@@ -54,17 +54,17 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 		this->layers[i].neurons = new Neuron[npl[i]];
 		this->layers[i].nOfNeurons = npl[i];
 
-		for (auto j = 0; j < layers[i].nOfNeurons; j++)
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
 			// Allocation for each component of each neuron.
 			this->layers[i].neurons[j].w = new double[layers[i - 1].nOfNeurons + 1];
 			this->layers[i].neurons[j].deltaW = 0;
 			this->layers[i].neurons[j].lastDeltaW = 0;
-			this->layers[i].neurons[j].wCopy =  new double[layers[i - 1].nOfNeurons + 1];
+			this->layers[i].neurons[j].wCopy = new double[layers[i - 1].nOfNeurons + 1];
 		}
 	}
 
-	// Last layer,
+	// Last layer
 	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
 	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
 
@@ -81,6 +81,7 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 			perror("Value of layers: nullptr.");
 
 	// Initialize the layers.
+	randomWeights();
 
 	return 1;
 }
@@ -102,7 +103,11 @@ void MultilayerPerceptron::freeMemory()
 // Feed all the weights (w) with random numbers between -1 and +1
 void MultilayerPerceptron::randomWeights()
 {
-	// ((double)rand() / RAND_MAX) * (b - a) + a; --> (a < b)
+	int a = -1, b = 1;
+	for (auto i = 1; i < this->nOfLayers; i++)
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a;
 }
 
 // ------------------------------

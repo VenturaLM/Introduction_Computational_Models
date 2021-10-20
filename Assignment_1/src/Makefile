@@ -1,7 +1,7 @@
-MLP: la1
+MultilayerPerceptron: la1
 	
-la1: la1.cpp
-	g++ la1.cpp imc/MultilayerPerceptron.cpp -o la1 -g
+la1: la1.cpp imc/MultilayerPerceptron.cpp
+	g++ -Wall -g la1.cpp imc/MultilayerPerceptron.cpp -o la1
 
 #---------------------------------------------------------
 
