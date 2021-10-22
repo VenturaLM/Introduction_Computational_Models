@@ -78,8 +78,7 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 			perror("Value of layers: nullptr.");
 
 	// Initialize the layers.
-	randomWeights();
-	//feedInputs();
+	randomWeights(); //MOVER RUNONLINEBACKPRO...
 
 	return 1;
 }
@@ -95,50 +94,22 @@ MultilayerPerceptron::~MultilayerPerceptron()
 // Free memory for the data structures
 void MultilayerPerceptron::freeMemory()
 {
-	// Last layer
-	delete[] this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].w;
-	delete this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].deltaW;
-	delete this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].lastDeltaW;
-	delete[] this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].wCopy;
-
-	delete[] this->layers[this->nOfLayers - 1].neurons;
-	//-------
 	// Hidden layers.
-	for (auto i = this->nOfLayers - 2; i >= 1; i--)
+	for (auto i = this->nOfLayers - 1; i >= 0; i--)
 	{
-		for (auto j = this->layers[i].nOfNeurons - 1; j >= 0; j--)
+		if(i != 0)
 		{
-			// Deallocation for each component of each neuron.
-			delete[] this->layers[i].neurons[j].w;
-			delete this->layers[i].neurons[j].deltaW;
-			delete this->layers[i].neurons[j].lastDeltaW;
-			delete[] this->layers[i].neurons[j].wCopy;
+			for (auto j = this->layers[i].nOfNeurons - 1; j >= 0; j--)
+			{
+				// Deallocation for each component of each neuron.
+				delete[] this->layers[i].neurons[j].w;
+				delete this->layers[i].neurons[j].deltaW;
+				delete this->layers[i].neurons[j].lastDeltaW;
+				delete[] this->layers[i].neurons[j].wCopy;
+			}
 		}
 		delete[] this->layers[i].neurons;
 	}
-	//-------
-	// First layer.
-	delete[] this->layers[0].neurons;
-	//--------------------------------------------------------------------------------
-	cout << "\nMEMORY RELEASE" << endl;
-	cout << "************" << endl;
-	// Check if all neurons and layers are nullptr.
-	for (auto i = 0; i < this->nOfLayers; i++)
-	{
-		if (this->layers[i].neurons == nullptr)
-			cout
-				<< "Values of neurons of layer " << i << ": " << this->layers[i].neurons << ". Successful release!" << endl;
-		else
-			cout << "Values of neurons of layer " << i << ": " << this->layers[i].neurons << ". Unsuccessful release!" << endl;
-	}
-
-	printf("\n");
-	delete[] this->layers;
-	if (this->layers == nullptr)
-		cout << "Value of layers: " << this->layers << ". Successful release!" << endl;
-	else
-		cout << "Value of layers: " << this->layers << ". Unsuccessful release!" << endl;
-	printf("\n");
 }
 
 // ------------------------------
@@ -152,11 +123,7 @@ void MultilayerPerceptron::randomWeights()
 		{
 			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
 			{
-				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a;
-				//
-				cout << "Layer=" << i << endl;
-				cout << "Neuron=" << j << endl;
-				cout << "w=" << this->layers[i].neurons[j].w[k] << endl;
+				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a; //randomdouble
 			}
 		}
 	}
@@ -166,16 +133,8 @@ void MultilayerPerceptron::randomWeights()
 // Feed the input neurons of the network with a vector passed as an argument
 void MultilayerPerceptron::feedInputs(double *input)
 {
-	// Fisrt layer.
-
-	//-------
-	// Hidden layers.
-	for (auto i = 1; i < this->nOfLayers - 2; i++)
-		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
-			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
-				this->layers[i].neurons[j].out = this->layers[i].neurons[j].w[k] * input[k];
-	//-------
-	// Last layer.
+	for (auto i = 0; i < this->layers[0].nOfNeurons; k++)
+			this->layers[0].neurons[i].out = input[i];
 }
 
 // ------------------------------
@@ -200,7 +159,7 @@ void MultilayerPerceptron::restoreWeights()
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
 void MultilayerPerceptron::forwardPropagate()
 {
-	// From the first leayer...
+	// From the second layer
 	// For every neuron
 	// Obtain the input wighted average
 
@@ -243,6 +202,8 @@ void MultilayerPerceptron::printNetwork()
 // input is the input vector of the pattern and target is the desired output vector of the pattern
 void MultilayerPerceptron::performEpochOnline(double *input, double *target)
 {
+	// feed
+	// TRansparencia 63
 }
 
 // ------------------------------
