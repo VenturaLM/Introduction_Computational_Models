@@ -41,14 +41,11 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 	this->nOfLayers = nl;
 	this->layers = new Layer[this->nOfLayers];
 
-	//--------------------------------------------------------------------------------
-
 	// First layer.
 	this->layers[0].neurons = new Neuron[npl[0]];
 	this->layers[0].nOfNeurons = npl[0];
 	//-------
-
-	// Middle layers.
+	// Hidden layers.
 	for (auto i = 1; i < this->nOfLayers - 2; i++)
 	{
 		this->layers[i].neurons = new Neuron[npl[i]];
@@ -63,7 +60,7 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 			this->layers[i].neurons[j].wCopy = new double[layers[i - 1].nOfNeurons + 1];
 		}
 	}
-
+	//-------
 	// Last layer
 	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
 	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
@@ -106,8 +103,7 @@ void MultilayerPerceptron::freeMemory()
 
 	delete[] this->layers[this->nOfLayers - 1].neurons;
 	//-------
-
-	// Middle layers.
+	// Hidden layers.
 	for (auto i = this->nOfLayers - 2; i >= 1; i--)
 	{
 		for (auto j = this->layers[i].nOfNeurons - 1; j >= 0; j--)
@@ -120,7 +116,7 @@ void MultilayerPerceptron::freeMemory()
 		}
 		delete[] this->layers[i].neurons;
 	}
-
+	//-------
 	// First layer.
 	delete[] this->layers[0].neurons;
 	//--------------------------------------------------------------------------------
@@ -170,10 +166,16 @@ void MultilayerPerceptron::randomWeights()
 // Feed the input neurons of the network with a vector passed as an argument
 void MultilayerPerceptron::feedInputs(double *input)
 {
-	for (auto i = 0; i < this->layers[0].nOfNeurons; i++)
-	{
-		// this->layers[0].neurons[i].inputs?
-	}
+	// Fisrt layer.
+
+	//-------
+	// Hidden layers.
+	for (auto i = 1; i < this->nOfLayers - 2; i++)
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].out = this->layers[i].neurons[j].w[k] * input[k];
+	//-------
+	// Last layer.
 }
 
 // ------------------------------
