@@ -77,9 +77,6 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 		if (this->layers == nullptr)
 			perror("Value of layers: nullptr.");
 
-	// Initialize the layers.
-	randomWeights(); //MOVER RUNONLINEBACKPRO...
-
 	return 1;
 }
 
@@ -94,10 +91,9 @@ MultilayerPerceptron::~MultilayerPerceptron()
 // Free memory for the data structures
 void MultilayerPerceptron::freeMemory()
 {
-	// Hidden layers.
 	for (auto i = this->nOfLayers - 1; i >= 0; i--)
 	{
-		if(i != 0)
+		if (i != 0) // Just free the elements of the hidden and last layers.
 		{
 			for (auto j = this->layers[i].nOfNeurons - 1; j >= 0; j--)
 			{
@@ -118,23 +114,17 @@ void MultilayerPerceptron::randomWeights()
 {
 	int a = -1, b = 1;
 	for (auto i = 1; i < this->nOfLayers; i++)
-	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
-		{
 			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
-			{
-				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a; //randomdouble
-			}
-		}
-	}
+				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a;
 }
 
 // ------------------------------
 // Feed the input neurons of the network with a vector passed as an argument
 void MultilayerPerceptron::feedInputs(double *input)
 {
-	for (auto i = 0; i < this->layers[0].nOfNeurons; k++)
-			this->layers[0].neurons[i].out = input[i];
+	for (auto i = 0; i < this->layers[0].nOfNeurons; i++)
+		this->layers[0].neurons[i].out = input[i];
 }
 
 // ------------------------------
@@ -159,11 +149,13 @@ void MultilayerPerceptron::restoreWeights()
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
 void MultilayerPerceptron::forwardPropagate()
 {
-	// From the second layer
-	// For every neuron
-	// Obtain the input wighted average
+	// TODO: CHECK.
+	for (auto i = 1; i < this->nOfLayers; i++)
+		for (auto j = 0; j < this->layers[i - 1].nOfNeurons; j++)
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].out = this->layers[i - 1].neurons[j].w[k] * this->layers[i - 1].neurons[j].out;
 
-	// Apply the activation function (sigmoid, for instance)
+	// TODO: Apply the activation function (sigmoid, for instance)
 }
 
 // ------------------------------
