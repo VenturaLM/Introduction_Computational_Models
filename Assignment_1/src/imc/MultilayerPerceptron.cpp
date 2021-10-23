@@ -58,7 +58,7 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 			}
 			else // Hidden layers.
 			{
-				this->layers[i].nOfNeurons = npl[1];
+				this->layers[i].nOfNeurons = npl[1]; // The reason of npl[1] and not npl[i] is that all hidden layers have the same amount of neurons.
 				this->layers[i].neurons = new Neuron[npl[1]];
 			}
 		}
@@ -204,7 +204,21 @@ double MultilayerPerceptron::obtainError(double *target)
 // Backpropagate the output error wrt a vector passed as an argument, from the last layer to the first one <--<--
 void MultilayerPerceptron::backpropagateError(double *target)
 {
-	//TODO
+	// delta = -( target[i] - out{i}{j} * g'(sigmoid) )
+	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
+		this->layers[this->nOfLayers].neurons[i].delta = -(target[i] - this->layers[this->nOfLayers].neurons[i].out) * this->layers[this->nOfLayers].neurons[i].out * (1.0 - this->layers[this->nOfLayers].neurons[i].out);
+
+	for (auto i = this->nOfLayers - 1; i >= 1; i--)
+	{
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+		{
+			double sum = 0.0;
+			for (auto k = 0; k < this->layers[i + 1].nOfNeurons; k++) // +1 due to the bias.
+				sum = sum + this->layers[i + 1].neurons[k].w[j + 1] * this->layers[i + 1].neurons[k].delta;
+
+			this->layers[i].neurons[j].delta = sum * this->layers[i].neurons[j].out * (1 - this->layers[i].neurons[j].out);
+		}
+	}
 }
 
 // ------------------------------
