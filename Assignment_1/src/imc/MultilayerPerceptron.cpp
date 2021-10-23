@@ -131,37 +131,53 @@ void MultilayerPerceptron::feedInputs(double *input)
 // Get the outputs predicted by the network (out vector the output layer) and save them in the vector passed as an argument
 void MultilayerPerceptron::getOutputs(double *output)
 {
+	//TODO
 }
 
 // ------------------------------
 // Make a copy of all the weights (copy w in wCopy)
 void MultilayerPerceptron::copyWeights()
 {
+	for (auto i = 1; i < this->nOfLayers; i++)
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].wCopy[k] = this->layers[i].neurons[j].w[k];
 }
 
 // ------------------------------
 // Restore a copy of all the weights (copy wCopy in w)
 void MultilayerPerceptron::restoreWeights()
 {
+	for (auto i = 1; i < this->nOfLayers; i++)
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].w[k] = this->layers[i].neurons[j].wCopy[k];
 }
 
 // ------------------------------
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
 void MultilayerPerceptron::forwardPropagate()
 {
-	// TODO: CHECK.
-	for (auto i = 1; i < this->nOfLayers; i++)
-		for (auto j = 0; j < this->layers[i - 1].nOfNeurons; j++)
-			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
-				this->layers[i].neurons[j].out = this->layers[i - 1].neurons[j].w[k] * this->layers[i - 1].neurons[j].out;
+	//TODO: Check segmentation fault.
+	for (auto i = 1; i < this->nOfLayers; i++) // Layer i.
+	{
+		for (auto j = 0; j < this->layers[i - 1].nOfNeurons; j++) // Neuron in layer (i - 1).
+		{
+			double sum = 0.0, net = 0.0;
+			for (auto k = 1; k < this->layers[i].nOfNeurons; k++)
+				sum = this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[j].out;
 
-	// TODO: Apply the activation function (sigmoid, for instance)
+			net = this->layers[i].neurons[j].w[0] + sum;
+			this->layers[i].neurons[j].out = (double)(1.0 / 1.0 + exp(-net)); // Activation function: Sigmoid.
+		}
+	}
 }
 
 // ------------------------------
 // Obtain the output error (MSE) of the out vector of the output layer wrt a target vector and return it
 double MultilayerPerceptron::obtainError(double *target)
 {
+	//TODO
 	return -1;
 }
 
@@ -169,24 +185,28 @@ double MultilayerPerceptron::obtainError(double *target)
 // Backpropagate the output error wrt a vector passed as an argument, from the last layer to the first one <--<--
 void MultilayerPerceptron::backpropagateError(double *target)
 {
+	//TODO
 }
 
 // ------------------------------
 // Accumulate the changes produced by one pattern and save them in deltaW
 void MultilayerPerceptron::accumulateChange()
 {
+	//TODO
 }
 
 // ------------------------------
 // Update the network weights, from the first layer to the last one
 void MultilayerPerceptron::weightAdjustment()
 {
+	//TODO
 }
 
 // ------------------------------
 // Print the network, i.e. all the weight matrices
 void MultilayerPerceptron::printNetwork()
 {
+	//TODO
 }
 
 // ------------------------------
@@ -194,6 +214,7 @@ void MultilayerPerceptron::printNetwork()
 // input is the input vector of the pattern and target is the desired output vector of the pattern
 void MultilayerPerceptron::performEpochOnline(double *input, double *target)
 {
+	//TODO
 	// feed
 	// TRansparencia 63
 }
@@ -282,6 +303,7 @@ void MultilayerPerceptron::trainOnline(Dataset *trainDataset)
 // Test the network with a dataset and return the MSE
 double MultilayerPerceptron::test(Dataset *testDataset)
 {
+	//TODO
 	return -1.0;
 }
 
