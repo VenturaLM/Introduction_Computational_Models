@@ -2,6 +2,7 @@
 // Introduction to computational models
 // Name        : la1.cpp
 // Author      : Pedro A. Gutiérrez
+// Student     : Ventura Lucena Martínez
 // Version     :
 // Copyright   : Universidad de Córdoba
 //============================================================================
@@ -158,6 +159,7 @@ int main(int argc, char **argv)
         double averageTrainError = 0, stdTrainError = 0;
 
         // Obtain training and test averages and standard deviations
+        //TODO
 
         cout << "FINAL REPORT" << endl;
         cout << "************" << endl;

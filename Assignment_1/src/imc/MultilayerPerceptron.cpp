@@ -1,6 +1,6 @@
 /*********************************************************************
 * File  : MultilayerPerceptron.cpp
-* Date  : 2020
+* Date  : 2021
 *********************************************************************/
 
 #include "MultilayerPerceptron.h"
@@ -197,7 +197,7 @@ double MultilayerPerceptron::obtainError(double *target)
 	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
 		sum = sum + pow(target[i] - this->layers[this->nOfLayers].neurons[i].out, 2);
 
-	return (1 / this->layers[this->nOfLayers].nOfNeurons) * sum;
+	return (1.0 / this->layers[this->nOfLayers].nOfNeurons) * sum;
 }
 
 // ------------------------------
@@ -213,7 +213,7 @@ void MultilayerPerceptron::backpropagateError(double *target)
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
 			double sum = 0.0;
-			for (auto k = 0; k < this->layers[i + 1].nOfNeurons; k++) // +1 due to the bias.
+			for (auto k = 0; k < this->layers[i + 1].nOfNeurons; k++)
 				sum = sum + this->layers[i + 1].neurons[k].w[j + 1] * this->layers[i + 1].neurons[k].delta;
 
 			this->layers[i].neurons[j].delta = sum * this->layers[i].neurons[j].out * (1 - this->layers[i].neurons[j].out);
@@ -225,21 +225,52 @@ void MultilayerPerceptron::backpropagateError(double *target)
 // Accumulate the changes produced by one pattern and save them in deltaW
 void MultilayerPerceptron::accumulateChange()
 {
-	//TODO
+	for (auto i = 1; i < this->nOfLayers; i++)
+	{
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+		{
+			for (auto k = 1; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].deltaW[k] = this->layers[i].neurons[j].deltaW[k] + this->layers[i].neurons[j].delta * this->layers[i - 1].neurons[j].out;
+
+			this->layers[i].neurons[j].deltaW[0] = this->layers[i].neurons[j].deltaW[0] + this->layers[i].neurons[j].delta * 1.0; // * 1.0 due to the bias.
+		}
+	}
 }
 
 // ------------------------------
 // Update the network weights, from the first layer to the last one
 void MultilayerPerceptron::weightAdjustment()
 {
-	//TODO
+	for (auto i = 1; i < this->nOfLayers; i++)
+	{
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+		{
+			for (auto k = 1; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].w[k] = this->layers[i].neurons[j].w[k] - this->eta * this->layers[i].neurons[j].deltaW[k] - this->mu * (this->eta * this->layers[i].neurons[j].lastDeltaW[k]);
+
+			this->layers[i].neurons[j].w[0] = this->layers[i].neurons[j].w[0] - this->eta * this->layers[i].neurons[j].deltaW[0] - this->mu * (this->eta * this->layers[i].neurons[j].lastDeltaW[0]);
+		}
+	}
 }
 
 // ------------------------------
 // Print the network, i.e. all the weight matrices
 void MultilayerPerceptron::printNetwork()
 {
-	//TODO
+	for (int i = 0; i < this->nOfLayers; i++)
+	{
+		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
+		{
+			cout << "{out = " << this->layers[i].neurons[j].out;
+
+			if (i != 0)
+				for (int k = 0; k < this->layers[i - 1].nOfNeurons + 1; k++)
+					cout << "\t\t w" << k << " = " << this->layers[i].neurons[j].w[k];
+
+			printf("}\n");
+		}
+	}
+	printf("\n");
 }
 
 // ------------------------------
@@ -247,9 +278,16 @@ void MultilayerPerceptron::printNetwork()
 // input is the input vector of the pattern and target is the desired output vector of the pattern
 void MultilayerPerceptron::performEpochOnline(double *input, double *target)
 {
-	//TODO
-	// feed
-	// TRansparencia 63
+	for (int i = 1; i < this->nOfLayers; i++)
+		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
+			for (int k = 0; k < this->layers[i - 1].nOfNeurons + 1; k++)
+				this->layers[i].neurons[j].deltaW[k] = 0;
+
+	this->feedInputs(input);
+	this->forwardPropagate();
+	this->backpropagateError(target);
+	this->accumulateChange();
+	this->weightAdjustment();
 }
 
 // ------------------------------
@@ -336,8 +374,10 @@ void MultilayerPerceptron::trainOnline(Dataset *trainDataset)
 // Test the network with a dataset and return the MSE
 double MultilayerPerceptron::test(Dataset *testDataset)
 {
-	//TODO
-	return -1.0;
+	this->feedInputs(*testDataset->inputs);
+	this->forwardPropagate();
+
+	return this->obtainError(*testDataset->outputs);
 }
 
 // Optional - KAGGLE
@@ -387,7 +427,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 	// Generate validation data
 	if (validationRatio > 0 && validationRatio < 1)
 	{
-		// .......
+		//TODO .......
 	}
 
 	// Learning
