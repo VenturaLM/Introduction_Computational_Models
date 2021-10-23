@@ -192,15 +192,12 @@ void MultilayerPerceptron::forwardPropagate()
 // Obtain the output error (MSE) of the out vector of the output layer wrt a target vector and return it
 double MultilayerPerceptron::obtainError(double *target)
 {
-	//TODO
-	// MSE --> delta{h, j} = -(target{j} - output{h, j} * g'(sigmoid))
-	double mse = 0.0;
+	// MSE = 1 / N * sum( (target[i] - out[i])^2 )
+	double sum = 0.0;
 	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
-	{
-		/* code */
-	}
+		sum = sum + pow(target[i] - this->layers[this->nOfLayers].neurons[i].out, 2);
 
-	return -1;
+	return (1 / this->layers[this->nOfLayers].nOfNeurons) * sum;
 }
 
 // ------------------------------
