@@ -41,37 +41,52 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 	this->nOfLayers = nl;
 	this->layers = new Layer[this->nOfLayers];
 
-	// First layer.
-	this->layers[0].neurons = new Neuron[npl[0]];
-	this->layers[0].nOfNeurons = npl[0];
 	//-------
-	// Hidden layers.
-	for (auto i = 1; i < this->nOfLayers - 2; i++)
-	{
-		this->layers[i].neurons = new Neuron[npl[i]];
-		this->layers[i].nOfNeurons = npl[i];
-
-		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+	for (auto i = 0; i < this->nOfLayers - 1; i++)
+	{				//TODO: revisar los indices, porque si tenemos mas de una hidden layer, esto no va a funcionar.
+		if (i == 0) // First layer.
 		{
-			// Allocation for each component of each neuron.
-			this->layers[i].neurons[j].w = new double[layers[i - 1].nOfNeurons + 1];
-			this->layers[i].neurons[j].deltaW = 0;
-			this->layers[i].neurons[j].lastDeltaW = 0;
-			this->layers[i].neurons[j].wCopy = new double[layers[i - 1].nOfNeurons + 1];
+			this->layers[i].nOfNeurons = npl[0];
+			this->layers[i].neurons = new Neuron[npl[0]];
+		}
+		else
+		{
+			if (i == nl - 1) // Last layer.
+			{
+				this->layers[i].nOfNeurons = npl[2];
+				this->layers[i].neurons = new Neuron[npl[2]];
+			}
+			else // Hidden layers.
+			{
+				this->layers[i].nOfNeurons = npl[1];
+				this->layers[i].neurons = new Neuron[npl[1]];
+			}
+		}
+
+		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
+		{
+			// First layer.
+			this->layers[i].neurons[j].out = 0.0;
+			this->layers[i].neurons[j].delta = 1.0;
+
+			if (i != 0) // Hidden and last layers.
+			{
+				int nOfWeight = this->layers[i - 1].nOfNeurons + 1;
+				this->layers[i].neurons[j].w = new double[nOfWeight];
+				this->layers[i].neurons[j].deltaW = new double[nOfWeight];
+				this->layers[i].neurons[j].lastDeltaW = new double[nOfWeight];
+				this->layers[i].neurons[j].wCopy = new double[nOfWeight];
+			}
+			else
+			{
+				this->layers[i].neurons[j].w = nullptr;
+				this->layers[i].neurons[j].deltaW = nullptr;
+				this->layers[i].neurons[j].lastDeltaW = nullptr;
+				this->layers[i].neurons[j].wCopy = nullptr;
+			}
 		}
 	}
 	//-------
-	// Last layer
-	this->layers[this->nOfLayers - 1].neurons = new Neuron[npl[2]];
-	this->layers[this->nOfLayers - 1].nOfNeurons = npl[2];
-
-	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].w = new double[layers[this->nOfLayers - 2].nOfNeurons + 1];
-	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].deltaW = 0;
-	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].lastDeltaW = 0;
-	this->layers[this->nOfLayers - 1].neurons[this->nOfLayers - 2].wCopy = new double[layers[this->nOfLayers - 2].nOfNeurons + 1];
-
-	//--------------------------------------------------------------------------------
-
 	// Check if layers is NULL.
 	for (auto i = 0; i < this->nOfLayers; i++)
 		if (this->layers == nullptr)
@@ -131,7 +146,8 @@ void MultilayerPerceptron::feedInputs(double *input)
 // Get the outputs predicted by the network (out vector the output layer) and save them in the vector passed as an argument
 void MultilayerPerceptron::getOutputs(double *output)
 {
-	//TODO
+	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
+		output[i] = this->layers[this->nOfLayers].neurons[i].out;
 }
 
 // ------------------------------
@@ -158,14 +174,13 @@ void MultilayerPerceptron::restoreWeights()
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
 void MultilayerPerceptron::forwardPropagate()
 {
-	//TODO: Check segmentation fault.
-	for (auto i = 1; i < this->nOfLayers; i++) // Layer i.
+	for (auto i = 1; i < this->nOfLayers; i++)
 	{
-		for (auto j = 0; j < this->layers[i - 1].nOfNeurons; j++) // Neuron in layer (i - 1).
+		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
 			double sum = 0.0, net = 0.0;
-			for (auto k = 1; k < this->layers[i].nOfNeurons; k++)
-				sum = this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[j].out;
+			for (auto k = 1; k < this->layers[i - 1].nOfNeurons + 1; k++) // +1 due to the bias.
+				sum = sum + this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[k - 1].out;
 
 			net = this->layers[i].neurons[j].w[0] + sum;
 			this->layers[i].neurons[j].out = (double)(1.0 / 1.0 + exp(-net)); // Activation function: Sigmoid.
@@ -178,6 +193,13 @@ void MultilayerPerceptron::forwardPropagate()
 double MultilayerPerceptron::obtainError(double *target)
 {
 	//TODO
+	// MSE --> delta{h, j} = -(target{j} - output{h, j} * g'(sigmoid))
+	double mse = 0.0;
+	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
+	{
+		/* code */
+	}
+
 	return -1;
 }
 

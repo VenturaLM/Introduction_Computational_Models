@@ -117,15 +117,15 @@ int main(int argc, char **argv)
             layers = stoi(lvalue);
 
         // Topology:
-        int *topology = new int[3];
+        int *topology = new int[layers];
 
         if (hflag)
         {
             int h = stoi(hvalue);
             topology[0] = trainDataset->nOfInputs;
-            for (int i = 1; i < layers + 2; i++)
+            for (int i = 1; i < layers + 1; i++)
                 topology[i] = h;
-            topology[layers] = trainDataset->nOfOutputs;
+            topology[layers + 2] = trainDataset->nOfOutputs;
         }
 
         mlp.initialize(layers + 2, topology);
