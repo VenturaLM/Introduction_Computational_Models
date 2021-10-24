@@ -11,9 +11,9 @@
             "program": "${workspaceFolder}/la1",
             "args": [
                 "-T",
-                "../datasets/dat/test_xor.dat",
+                "../datasets/dat/test_parkinsons.dat",
                 "-t",
-                "../datasets/dat/train_xor.dat",
+                "../datasets/dat/train_parkinsons.dat",
                 "-i",
                 "1000",
                 "-l",

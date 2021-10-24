@@ -126,8 +126,8 @@ void MultilayerPerceptron::feedInputs(double *input)
 // Get the outputs predicted by the network (out vector the output layer) and save them in the vector passed as an argument
 void MultilayerPerceptron::getOutputs(double *output)
 {
-	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
-		output[i] = this->layers[this->nOfLayers].neurons[i].out;
+	for (auto i = 0; i < this->layers[this->nOfLayers - 1].nOfNeurons; i++)
+		output[i] = this->layers[this->nOfLayers - 1].neurons[i].out;
 }
 
 // ------------------------------
@@ -185,10 +185,10 @@ double MultilayerPerceptron::obtainError(double *target)
 void MultilayerPerceptron::backpropagateError(double *target)
 {
 	// delta = -( target[i] - out{i}{j} * g'(sigmoid) )
-	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
-		this->layers[this->nOfLayers].neurons[i].delta = -(target[i] - this->layers[this->nOfLayers].neurons[i].out) * this->layers[this->nOfLayers].neurons[i].out * (1.0 - this->layers[this->nOfLayers].neurons[i].out);
+	for (auto i = 0; i < this->layers[this->nOfLayers - 1].nOfNeurons; i++)
+		this->layers[this->nOfLayers - 1].neurons[i].delta = -(target[i] - this->layers[this->nOfLayers - 1].neurons[i].out) * this->layers[this->nOfLayers - 1].neurons[i].out * (1.0 - this->layers[this->nOfLayers - 1].neurons[i].out);
 
-	for (auto i = this->nOfLayers - 1; i >= 1; i--)
+	for (auto i = this->nOfLayers - 2; i >= 1; i--)
 	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
