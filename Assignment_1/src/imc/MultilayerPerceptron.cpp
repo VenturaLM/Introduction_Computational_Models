@@ -49,13 +49,10 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 
 		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			if (i == 0)
-			{ // First layer.
-				this->layers[i].neurons[j].out = 0.0;
-				this->layers[i].neurons[j].delta = 1.0;
-			}
+			this->layers[i].neurons[j].out = 0.0;
+			this->layers[i].neurons[j].delta = 1.0;
 
-			else if (i != 0)
+			if (i != 0)
 			{ // Hidden and last layers.
 				int nOfWeight = this->layers[i - 1].nOfNeurons + 1;
 				this->layers[i].neurons[j].w = new double[nOfWeight];
@@ -109,9 +106,18 @@ void MultilayerPerceptron::randomWeights()
 {
 	int a = -1, b = 1;
 	for (auto i = 1; i < this->nOfLayers; i++)
+	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
+		{
 			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+			{
 				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a;
+				this->layers[i].neurons[j].deltaW[k] = 0.0;
+				this->layers[i].neurons[j].lastDeltaW[k] = 0.0;
+				this->layers[i].neurons[j].wCopy[k] = 0.0;
+			}
+		}
+	}
 }
 
 // ------------------------------
@@ -160,10 +166,10 @@ void MultilayerPerceptron::forwardPropagate()
 		{
 			double sum = 0.0, net = 0.0;
 			for (auto k = 1; k < this->layers[i - 1].nOfNeurons + 1; k++) // +1 due to the bias.
-				sum += this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[k - 1].out;
+				sum += (this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[k - 1].out);
 
 			net = this->layers[i].neurons[j].w[0] + sum;
-			this->layers[i].neurons[j].out = (double)(1.0 / 1.0 + exp(-net)); // Activation function: Sigmoid.
+			this->layers[i].neurons[j].out = 1.0 / (1.0 + exp(-net)); // Activation function: Sigmoid.
 		}
 	}
 }
