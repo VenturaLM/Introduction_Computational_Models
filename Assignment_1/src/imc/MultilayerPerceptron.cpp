@@ -42,50 +42,30 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 	this->layers = new Layer[this->nOfLayers];
 
 	//-------
-	for (auto i = 0; i < this->nOfLayers - 1; i++)
-	{				//TODO: revisar los indices, porque si tenemos mas de una hidden layer, esto no va a funcionar.
-		if (i == 0) // First layer.
-		{
-			this->layers[i].nOfNeurons = npl[0];
-			this->layers[i].neurons = new Neuron[npl[0]];
-		}
-		else
-		{
-			if (i == nl - 1) // Last layer.
-			{
-				this->layers[i].nOfNeurons = npl[2];
-				this->layers[i].neurons = new Neuron[npl[2]];
-			}
-			else // Hidden layers.
-			{
-				this->layers[i].nOfNeurons = npl[1]; // The reason of npl[1] and not npl[i] is that all hidden layers have the same amount of neurons.
-				this->layers[i].neurons = new Neuron[npl[1]];
-			}
-		}
+	for (auto i = 0; i < this->nOfLayers; i++)
+	{
+		this->layers[i].nOfNeurons = npl[i];
+		this->layers[i].neurons = new Neuron[npl[i]];
 
 		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			// First layer.
-			this->layers[i].neurons[j].out = 0.0;
-			this->layers[i].neurons[j].delta = 1.0;
+			if (i == 0)
+			{ // First layer.
+				this->layers[i].neurons[j].out = 0.0;
+				this->layers[i].neurons[j].delta = 1.0;
+			}
 
-			if (i != 0) // Hidden and last layers.
-			{
+			else if (i != 0)
+			{ // Hidden and last layers.
 				int nOfWeight = this->layers[i - 1].nOfNeurons + 1;
 				this->layers[i].neurons[j].w = new double[nOfWeight];
 				this->layers[i].neurons[j].deltaW = new double[nOfWeight];
 				this->layers[i].neurons[j].lastDeltaW = new double[nOfWeight];
 				this->layers[i].neurons[j].wCopy = new double[nOfWeight];
 			}
-			else
-			{
-				this->layers[i].neurons[j].w = nullptr;
-				this->layers[i].neurons[j].deltaW = nullptr;
-				this->layers[i].neurons[j].lastDeltaW = nullptr;
-				this->layers[i].neurons[j].wCopy = nullptr;
-			}
 		}
 	}
+
 	//-------
 	// Check if layers is NULL.
 	for (auto i = 0; i < this->nOfLayers; i++)
@@ -180,7 +160,7 @@ void MultilayerPerceptron::forwardPropagate()
 		{
 			double sum = 0.0, net = 0.0;
 			for (auto k = 1; k < this->layers[i - 1].nOfNeurons + 1; k++) // +1 due to the bias.
-				sum = sum + this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[k - 1].out;
+				sum += this->layers[i].neurons[j].w[k] * this->layers[i - 1].neurons[k - 1].out;
 
 			net = this->layers[i].neurons[j].w[0] + sum;
 			this->layers[i].neurons[j].out = (double)(1.0 / 1.0 + exp(-net)); // Activation function: Sigmoid.
@@ -194,10 +174,10 @@ double MultilayerPerceptron::obtainError(double *target)
 {
 	// MSE = 1 / N * sum( (target[i] - out[i])^2 )
 	double sum = 0.0;
-	for (auto i = 0; i < this->layers[this->nOfLayers].nOfNeurons; i++)
-		sum = sum + pow(target[i] - this->layers[this->nOfLayers].neurons[i].out, 2);
+	for (auto i = 0; i < this->layers[this->nOfLayers - 1].nOfNeurons; i++)
+		sum += pow(target[i] - this->layers[this->nOfLayers - 1].neurons[i].out, 2);
 
-	return (1.0 / this->layers[this->nOfLayers].nOfNeurons) * sum;
+	return (1.0 / this->layers[this->nOfLayers - 1].nOfNeurons) * sum;
 }
 
 // ------------------------------
@@ -214,7 +194,7 @@ void MultilayerPerceptron::backpropagateError(double *target)
 		{
 			double sum = 0.0;
 			for (auto k = 0; k < this->layers[i + 1].nOfNeurons; k++)
-				sum = sum + this->layers[i + 1].neurons[k].w[j + 1] * this->layers[i + 1].neurons[k].delta;
+				sum += this->layers[i + 1].neurons[k].w[j + 1] * this->layers[i + 1].neurons[k].delta;
 
 			this->layers[i].neurons[j].delta = sum * this->layers[i].neurons[j].out * (1 - this->layers[i].neurons[j].out);
 		}
@@ -229,10 +209,10 @@ void MultilayerPerceptron::accumulateChange()
 	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			for (auto k = 1; k < this->layers[i - 1].nOfNeurons; k++)
-				this->layers[i].neurons[j].deltaW[k] = this->layers[i].neurons[j].deltaW[k] + this->layers[i].neurons[j].delta * this->layers[i - 1].neurons[j].out;
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+				this->layers[i].neurons[j].deltaW[k + 1] = this->layers[i].neurons[j].deltaW[k] + this->layers[i].neurons[j].delta * this->layers[i - 1].neurons[j].out;
 
-			this->layers[i].neurons[j].deltaW[0] = this->layers[i].neurons[j].deltaW[0] + this->layers[i].neurons[j].delta * 1.0; // * 1.0 due to the bias.
+			this->layers[i].neurons[j].deltaW[0] += this->layers[i].neurons[j].delta * 1.0; // * 1.0 due to the bias.
 		}
 	}
 }
@@ -245,7 +225,7 @@ void MultilayerPerceptron::weightAdjustment()
 	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			for (auto k = 1; k < this->layers[i - 1].nOfNeurons; k++)
+			for (auto k = 0; k < this->layers[i - 1].nOfNeurons + 1; k++)
 				this->layers[i].neurons[j].w[k] = this->layers[i].neurons[j].w[k] - this->eta * this->layers[i].neurons[j].deltaW[k] - this->mu * (this->eta * this->layers[i].neurons[j].lastDeltaW[k]);
 
 			this->layers[i].neurons[j].w[0] = this->layers[i].neurons[j].w[0] - this->eta * this->layers[i].neurons[j].deltaW[0] - this->mu * (this->eta * this->layers[i].neurons[j].lastDeltaW[0]);
@@ -259,15 +239,16 @@ void MultilayerPerceptron::printNetwork()
 {
 	for (int i = 0; i < this->nOfLayers; i++)
 	{
+		cout << "Layer " << i << endl;
 		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			cout << "{out = " << this->layers[i].neurons[j].out;
+			cout << "[out = " << this->layers[i].neurons[j].out;
 
 			if (i != 0)
 				for (int k = 0; k < this->layers[i - 1].nOfNeurons + 1; k++)
 					cout << "\t\t w" << k << " = " << this->layers[i].neurons[j].w[k];
 
-			printf("}\n");
+			printf("]\n");
 		}
 	}
 	printf("\n");
@@ -383,7 +364,7 @@ double MultilayerPerceptron::test(Dataset *testDataset)
 // Optional - KAGGLE
 // Test the network with a dataset and return the MSE
 // Your have to use the format from Kaggle: two columns (Id y predictied)
-void MultilayerPerceptron::predict(Dataset *pDatosTest)
+void MultilayerPerceptron::predict(Dataset *testDataset)
 {
 	int i;
 	int j;
@@ -392,10 +373,10 @@ void MultilayerPerceptron::predict(Dataset *pDatosTest)
 
 	cout << "Id,Predicted" << endl;
 
-	for (i = 0; i < pDatosTest->nOfPatterns; i++)
+	for (i = 0; i < testDataset->nOfPatterns; i++)
 	{
 
-		feedInputs(pDatosTest->inputs[i]);
+		feedInputs(testDataset->inputs[i]);
 		forwardPropagate();
 		getOutputs(obtained);
 
@@ -411,7 +392,7 @@ void MultilayerPerceptron::predict(Dataset *pDatosTest)
 // Run the traning algorithm for a given number of epochs, using trainDataset
 // Once finished, check the performance of the network in testDataset
 // Both training and test MSEs should be obtained and stored in errorTrain and errorTest
-void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Dataset *pDatosTest, int maxiter, double *errorTrain, double *errorTest)
+void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Dataset *testDataset, int epochs, double *errorTrain, double *errorTest)
 {
 	int countTrain = 0;
 
@@ -451,7 +432,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 		{
 			cout << "We exit because the training is not improving!!" << endl;
 			restoreWeights();
-			countTrain = maxiter;
+			countTrain = epochs;
 		}
 
 		countTrain++;
@@ -463,7 +444,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 
 		cout << "Iteration " << countTrain << "\t Training error: " << trainError << "\t Validation error: " << validationError << endl;
 
-	} while (countTrain < maxiter);
+	} while (countTrain < epochs);
 
 	cout << "NETWORK WEIGHTS" << endl;
 	cout << "===============" << endl;
@@ -471,21 +452,21 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 
 	cout << "Desired output Vs Obtained output (test)" << endl;
 	cout << "=========================================" << endl;
-	for (int i = 0; i < pDatosTest->nOfPatterns; i++)
+	for (int i = 0; i < testDataset->nOfPatterns; i++)
 	{
-		double *prediction = new double[pDatosTest->nOfOutputs];
+		double *prediction = new double[testDataset->nOfOutputs];
 
 		// Feed the inputs and propagate the values
-		feedInputs(pDatosTest->inputs[i]);
+		feedInputs(testDataset->inputs[i]);
 		forwardPropagate();
 		getOutputs(prediction);
-		for (int j = 0; j < pDatosTest->nOfOutputs; j++)
-			cout << pDatosTest->outputs[i][j] << " -- " << prediction[j] << " ";
+		for (int j = 0; j < testDataset->nOfOutputs; j++)
+			cout << testDataset->outputs[i][j] << " -- " << prediction[j] << " ";
 		cout << endl;
 		delete[] prediction;
 	}
 
-	testError = test(pDatosTest);
+	testError = test(testDataset);
 	*errorTest = testError;
 	*errorTrain = minTrainError;
 }

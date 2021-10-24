@@ -29,15 +29,15 @@ using namespace std;
 int main(int argc, char **argv)
 {
     // Process arguments of the command line
-    bool Tflag = false, wflag = false, pflag = false, tflag = false, iflag = false, lflag = false, hflag = false, eflag = false, mflag = false;
-    char *Tvalue = nullptr, *wvalue = nullptr, *tvalue = nullptr, *ivalue = nullptr, *lvalue = nullptr, *hvalue = nullptr, *evalue = nullptr, *mvalue = nullptr;
+    bool Tflag = false, wflag = false, pflag = false, tflag = false, iflag = false, lflag = false, hflag = false, eflag = false, mflag = false, vflag = false, dflag = false;
+    char *Tvalue = nullptr, *wvalue = nullptr, *tvalue = nullptr, *ivalue = nullptr, *lvalue = nullptr, *hvalue = nullptr, *evalue = nullptr, *mvalue = nullptr, *vvalue = nullptr, *dvalue = nullptr;
     int c;
 
     opterr = 0;
 
     // a: Option that requires an argument
     // a:: The argument required is optional
-    while ((c = getopt(argc, argv, "T:w:p:t:i:l:h:e:m:")) != -1)
+    while ((c = getopt(argc, argv, "T:w:p:t:i:l:h:e:m:v:d:")) != -1)
     {
         // The parameters needed for using the optional prediction mode of Kaggle have been included.
         // You should add the rest of parameters needed for the lab assignment.
@@ -71,6 +71,14 @@ int main(int argc, char **argv)
             mflag = true;
             mvalue = optarg;
             break;
+        case 'v':
+            vflag = true;
+            vvalue = optarg;
+            break;
+        case 'd':
+            dflag = true;
+            dvalue = optarg;
+            break;
         case 'w':
             wflag = true;
             wvalue = optarg;
@@ -79,7 +87,7 @@ int main(int argc, char **argv)
             pflag = true;
             break;
         case '?':
-            if (optopt == 'T' || optopt == 'w' || optopt == 'p' || optopt == 't' || optopt == 'i' || optopt == 'l' || optopt == 'h' || optopt == 'e')
+            if (optopt == 'T' || optopt == 'w' || optopt == 'p' || optopt == 't' || optopt == 'i' || optopt == 'l' || optopt == 'h' || optopt == 'e' || optopt == 'v' || optopt == 'd')
                 fprintf(stderr, "The option -%c requires an argument.\n", optopt);
             else if (isprint(optopt))
                 fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -102,8 +110,15 @@ int main(int argc, char **argv)
 
         // Multilayer perceptron object
         MultilayerPerceptron mlp;
+        if (eflag)
+            mlp.eta = stod(evalue);
+        if (mflag)
+            mlp.mu = stod(mvalue);
+        if (vflag)
+            mlp.validationRatio = stod(vvalue);
+        if (dflag)
+            mlp.decrementFactor = stod(dvalue);
 
-        // Parameters of the mlp. For example, mlp.eta = value;
         int iterations = 1000;
         if (iflag)
             iterations = stoi(ivalue);
@@ -118,7 +133,7 @@ int main(int argc, char **argv)
             layers = stoi(lvalue);
 
         // Topology:
-        int *topology = new int[layers];
+        int *topology = new int[layers + 2];
 
         if (hflag)
         {
@@ -126,7 +141,7 @@ int main(int argc, char **argv)
             topology[0] = trainDataset->nOfInputs;
             for (int i = 1; i < layers + 1; i++)
                 topology[i] = h;
-            topology[layers + 2] = trainDataset->nOfOutputs;
+            topology[layers + 1] = trainDataset->nOfOutputs;
         }
 
         mlp.initialize(layers + 2, topology);
