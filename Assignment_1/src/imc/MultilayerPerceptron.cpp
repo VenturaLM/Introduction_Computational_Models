@@ -409,18 +409,50 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 	int iterWithoutImproving;
 	double testError = 0;
 
+	int iterWithoutImprovingValidation = 0;
 	double validationError = 1;
 
+	Dataset *validationDataset = new Dataset;
+	bool validation = false;
+
 	// Generate validation data
-	if (validationRatio > 0 && validationRatio < 1)
+	if (this->validationRatio > 0.0 && this->validationRatio < 1.0)
 	{
-		//TODO .......
+		validation = true;
+		int min = 0, max = trainDataset->nOfPatterns - 1, howMany = validationRatio * trainDataset->nOfPatterns;
+		if (howMany == 0)
+			howMany = 1; // At least take 1 element in the integerRandomVectorWithoutRepeating()
+
+		int *indexes = integerRandomVectorWithoutRepeating(min, max, howMany);
+
+		if (validationDataset == nullptr)
+			perror("Error: Validation Dataset no allocated.");
+		validationDataset->nOfInputs = trainDataset->nOfInputs;
+		validationDataset->nOfOutputs = trainDataset->nOfOutputs;
+		validationDataset->nOfPatterns = howMany;
+		validationDataset->inputs = new double *[howMany];
+		validationDataset->outputs = new double *[howMany];
+
+		for (auto i = 0; i < validationDataset->nOfPatterns; i++)
+		{
+			validationDataset->inputs[i] = new double[validationDataset->nOfInputs];
+			validationDataset->outputs[i] = new double[validationDataset->nOfOutputs];
+		}
+
+		for (auto i = 0; i < validationDataset->nOfPatterns; i++)
+		{
+			for (auto j = 0; j < validationDataset->nOfInputs; j++)
+				validationDataset->inputs[i][j] = testDataset->inputs[indexes[i]][j];
+
+			for (auto j = 0; j < validationDataset->nOfOutputs; j++)
+				validationDataset->outputs[i][j] = testDataset->inputs[indexes[i]][j];
+		}
 	}
 
 	// Learning
 	do
 	{
-
+		// Training:
 		trainOnline(trainDataset);
 		double trainError = test(trainDataset);
 		if (countTrain == 0 || trainError < minTrainError)
@@ -447,6 +479,24 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 		// BE CAREFUL: in this case, we have to save the last validation error, not the minimum one
 		// Apart from this, the way the stopping condition is checked is the same than that
 		// applied for the training set
+
+		// Validation:
+		if (validation)
+		{
+			validationError = test(validationDataset);
+
+			if ((validationError - testError) < 0.00001) // AQUI VA TESTERROR O TRAINING ERROR (?)
+				iterWithoutImprovingValidation = 0;
+			else
+				iterWithoutImprovingValidation++;
+
+			if (iterWithoutImprovingValidation == 50)
+			{
+				cout << "We exit because the validation is not improving!!" << endl;
+				restoreWeights();
+				countTrain = epochs;
+			}
+		}
 
 		cout << "Iteration " << countTrain << "\t Training error: " << trainError << "\t Validation error: " << validationError << endl;
 
@@ -478,10 +528,10 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 }
 
 // Optional Kaggle: Save the model weights in a textfile
-bool MultilayerPerceptron::saveWeights(const char *archivo)
+bool MultilayerPerceptron::saveWeights(const char *file)
 {
 	// Object for writing the file
-	ofstream f(archivo);
+	ofstream f(file);
 
 	if (!f.is_open())
 		return false;
@@ -505,10 +555,10 @@ bool MultilayerPerceptron::saveWeights(const char *archivo)
 }
 
 // Optional Kaggle: Load the model weights from a textfile
-bool MultilayerPerceptron::readWeights(const char *archivo)
+bool MultilayerPerceptron::readWeights(const char *file)
 {
 	// Object for reading a file
-	ifstream f(archivo);
+	ifstream f(file);
 
 	if (!f.is_open())
 		return false;

@@ -120,10 +120,10 @@ namespace imc
 		void runOnlineBackPropagation(Dataset *trainDataset, Dataset *testDataset, int epochs, double *errorTrain, double *errorTest);
 
 		// Optional Kaggle: Save the model weights in a textfile
-		bool saveWeights(const char *archivo);
+		bool saveWeights(const char *file);
 
 		// Optional Kaggle: Load the model weights from a textfile
-		bool readWeights(const char *archivo);
+		bool readWeights(const char *file);
 	};
 
 };

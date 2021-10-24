@@ -29,7 +29,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
     // Process arguments of the command line
-    bool Tflag = false, wflag = false, pflag = false, tflag = false, iflag = false, lflag = false, hflag = false, eflag = false, mflag = false, vflag = false, dflag = false;
+    bool wflag = false, pflag = false, iflag = false, lflag = false, hflag = false, eflag = false, mflag = false, vflag = false, dflag = false;
     char *Tvalue = nullptr, *wvalue = nullptr, *tvalue = nullptr, *ivalue = nullptr, *lvalue = nullptr, *hvalue = nullptr, *evalue = nullptr, *mvalue = nullptr, *vvalue = nullptr, *dvalue = nullptr;
     int c;
 
@@ -44,11 +44,9 @@ int main(int argc, char **argv)
         switch (c)
         {
         case 'T':
-            Tflag = true;
             Tvalue = optarg;
             break;
         case 't':
-            tflag = true;
             tvalue = optarg;
             break;
         case 'i':
@@ -173,8 +171,7 @@ int main(int argc, char **argv)
         double averageTestError = 0, stdTestError = 0;
         double averageTrainError = 0, stdTrainError = 0;
 
-        // Obtain training and test averages and standard deviations
-        //TODO
+        //TODO: Obtain training and test averages and standard deviations
 
         cout << "FINAL REPORT" << endl;
         cout << "************" << endl;

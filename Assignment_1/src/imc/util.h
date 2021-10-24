@@ -7,32 +7,38 @@
 
 #ifndef UTIL_H_
 #define UTIL_H_
-#include <cstdlib>  // To establish the seed srand() and generate pseudorandom numbers rand()
+#include <cstdlib> // To establish the seed srand() and generate pseudorandom numbers rand()
+#include <iostream>
 
-namespace util{
-static int * integerRandomVectoWithoutRepeating(int min, int max, int howMany){
-        int total = max-min+1;
-        int* numbersToBeSelected = new int[total];
-        int* numbersSelected = new int[howMany];
-        // Initialize the list of possible selections
-        for(int i = 0; i < total; i++)
-                numbersToBeSelected[i] = min+i;
-
-        for(int i=0; i < howMany; i++)
+namespace util
+{
+        static int *integerRandomVectorWithoutRepeating(int min, int max, int howMany)
         {
-                int selectedNumber = rand() % (total-i);
-                // Store the selected number
-                numbersSelected[i]=numbersToBeSelected[selectedNumber];
-                // We include the last valid number in numbersToBeSelected, in this way
-                // all numbers are valid until total-i-1
-                numbersToBeSelected[selectedNumber]=numbersToBeSelected[total-i-1];
-        }
-        delete [] numbersToBeSelected;
-        return numbersSelected;
+                int total = max - min + 1;
+                int *numbersToBeSelected = new int[total];
+                int *numbersSelected = new int[howMany];
+                // Initialize the list of possible selections
+                for (int i = 0; i < total; i++)
+                        numbersToBeSelected[i] = min + i;
 
-};
+                for (int i = 0; i < howMany; i++)
+                {
+                        int selectedNumber = rand() % (total - i);
+                        // Store the selected number
+                        numbersSelected[i] = numbersToBeSelected[selectedNumber];
+                        // We include the last valid number in numbersToBeSelected, in this way
+                        // all numbers are valid until total-i-1
+                        numbersToBeSelected[selectedNumber] = numbersToBeSelected[total - i - 1];
+                }
+                delete[] numbersToBeSelected;
+                return numbersSelected;
+        };
 
+        static void printIntegerRandomVector(int *v, int howMany)
+        {
+                for (auto i = 0; i < howMany; i++)
+                        std::cout << "v[" << i << "]= " << v[i] << std::endl;
+        };
 }
-
 
 #endif /* UTIL_H_ */
