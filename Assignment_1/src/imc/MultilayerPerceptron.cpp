@@ -215,7 +215,7 @@ void MultilayerPerceptron::accumulateChange()
 	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
+			for (auto k = 1; k < this->layers[i - 1].nOfNeurons; k++)
 				this->layers[i].neurons[j].deltaW[k + 1] = this->layers[i].neurons[j].deltaW[k] + this->layers[i].neurons[j].delta * this->layers[i - 1].neurons[j].out;
 
 			this->layers[i].neurons[j].deltaW[0] += this->layers[i].neurons[j].delta * 1.0; // * 1.0 due to the bias.
@@ -231,7 +231,7 @@ void MultilayerPerceptron::weightAdjustment()
 	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
-			for (auto k = 0; k < this->layers[i - 1].nOfNeurons + 1; k++)
+			for (auto k = 1; k < this->layers[i - 1].nOfNeurons + 1; k++) // The bias is set below.
 				this->layers[i].neurons[j].w[k] = this->layers[i].neurons[j].w[k] - this->eta * this->layers[i].neurons[j].deltaW[k] - this->mu * (this->eta * this->layers[i].neurons[j].lastDeltaW[k]);
 
 			this->layers[i].neurons[j].w[0] = this->layers[i].neurons[j].w[0] - this->eta * this->layers[i].neurons[j].deltaW[0] - this->mu * (this->eta * this->layers[i].neurons[j].lastDeltaW[0]);
@@ -246,6 +246,7 @@ void MultilayerPerceptron::printNetwork()
 	for (int i = 0; i < this->nOfLayers; i++)
 	{
 		cout << "\nLayer " << i << endl;
+		cout << "----------" << endl;
 		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
 			cout << "[out = " << this->layers[i].neurons[j].out;
@@ -442,10 +443,10 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 		for (auto i = 0; i < validationDataset->nOfPatterns; i++)
 		{
 			for (auto j = 0; j < validationDataset->nOfInputs; j++)
-				validationDataset->inputs[i][j] = testDataset->inputs[indexes[i]][j];
+				validationDataset->inputs[i][j] = trainDataset->inputs[indexes[i]][j];
 
 			for (auto j = 0; j < validationDataset->nOfOutputs; j++)
-				validationDataset->outputs[i][j] = testDataset->inputs[indexes[i]][j];
+				validationDataset->outputs[i][j] = trainDataset->inputs[indexes[i]][j];
 		}
 	}
 
@@ -502,8 +503,8 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 
 	} while (countTrain < epochs);
 
-	cout << "NETWORK WEIGHTS" << endl;
-	cout << "===============" << endl;
+	cout << "\nNETWORK WEIGHTS" << endl;
+	cout << "===============";
 	printNetwork();
 
 	cout << "Desired output Vs Obtained output (test)" << endl;
