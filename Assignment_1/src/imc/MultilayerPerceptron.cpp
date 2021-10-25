@@ -463,6 +463,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 		// Training:
 		trainOnline(trainDataset);
 		double trainError = test(trainDataset);
+
 		if (countTrain == 0 || trainError < minTrainError)
 		{
 			minTrainError = trainError;
@@ -502,7 +503,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 			{
 				cout << "We exit because the validation is not improving!!" << endl;
 				restoreWeights();
-				//countTrain = epochs;
+				countTrain = epochs;
 			}
 		}
 
