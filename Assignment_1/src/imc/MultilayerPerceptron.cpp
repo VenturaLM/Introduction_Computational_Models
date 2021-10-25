@@ -183,7 +183,7 @@ double MultilayerPerceptron::obtainError(double *target)
 	for (auto i = 0; i < this->layers[this->nOfLayers - 1].nOfNeurons; i++)
 		sum += pow(target[i] - this->layers[this->nOfLayers - 1].neurons[i].out, 2);
 
-	return (1.0 / this->layers[this->nOfLayers - 1].nOfNeurons) * sum;
+	return (1.0 / (double)this->layers[this->nOfLayers - 1].nOfNeurons) * sum;
 }
 
 // ------------------------------
@@ -362,10 +362,15 @@ void MultilayerPerceptron::trainOnline(Dataset *trainDataset)
 // Test the network with a dataset and return the MSE
 double MultilayerPerceptron::test(Dataset *testDataset)
 {
-	this->feedInputs(*testDataset->inputs);
-	this->forwardPropagate();
+	double sum = 0.0;
+	for (auto i = 0; i < testDataset->nOfPatterns; i++)
+	{
+		this->feedInputs(testDataset->inputs[i]);
+		this->forwardPropagate();
+		sum += this->obtainError(*testDataset->outputs);
+	}
 
-	return this->obtainError(*testDataset->outputs);
+	return (1.0 / (double)testDataset->nOfPatterns) * sum;
 }
 
 // Optional - KAGGLE
@@ -495,7 +500,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 			{
 				cout << "We exit because the validation is not improving!!" << endl;
 				restoreWeights();
-				countTrain = epochs;
+				//countTrain = epochs;
 			}
 		}
 
