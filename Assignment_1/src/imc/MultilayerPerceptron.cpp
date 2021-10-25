@@ -104,14 +104,16 @@ void MultilayerPerceptron::freeMemory()
 // Feed all the weights (w) with random numbers between -1 and +1
 void MultilayerPerceptron::randomWeights()
 {
-	int a = -1, b = 1;
+	srand(time(NULL));
+	int a = -1.0, b = 1.0;
+
 	for (auto i = 1; i < this->nOfLayers; i++)
 	{
 		for (auto j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
 			for (auto k = 0; k < this->layers[i - 1].nOfNeurons; k++)
 			{
-				this->layers[i].neurons[j].w[k] = ((double)rand() / RAND_MAX) * (b - a) + a;
+				this->layers[i].neurons[j].w[k] = ((double)rand() / (double)RAND_MAX) * (b - a) + a;
 				this->layers[i].neurons[j].deltaW[k] = 0.0;
 				this->layers[i].neurons[j].lastDeltaW[k] = 0.0;
 				this->layers[i].neurons[j].wCopy[k] = 0.0;
@@ -367,7 +369,7 @@ double MultilayerPerceptron::test(Dataset *testDataset)
 	{
 		this->feedInputs(testDataset->inputs[i]);
 		this->forwardPropagate();
-		sum += this->obtainError(*testDataset->outputs);
+		sum += this->obtainError(testDataset->outputs[i]);
 	}
 
 	return (1.0 / (double)testDataset->nOfPatterns) * sum;
