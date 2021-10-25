@@ -22,6 +22,7 @@
 #include <cstring>
 
 #include "imc/MultilayerPerceptron.h"
+#include "imc/util.h"
 
 using namespace imc;
 using namespace std;
@@ -171,12 +172,13 @@ int main(int argc, char **argv)
         double averageTestError = 0, stdTestError = 0;
         double averageTrainError = 0, stdTrainError = 0;
 
-        //TODO: Obtain training and test averages and standard deviations
+        util::computeAverageErrors(testErrors, trainErrors, averageTestError, averageTrainError);
+        util::computeStdErrors(testErrors, trainErrors, stdTestError, stdTrainError, averageTestError, averageTrainError);
 
-        cout << "FINAL REPORT" << endl;
+        cout << "\nFINAL REPORT" << endl;
         cout << "************" << endl;
         cout << "Train error (Mean +- SD): " << averageTrainError << " +- " << stdTrainError << endl;
-        cout << "Test error (Mean +- SD):          " << averageTestError << " +- " << stdTestError << endl;
+        cout << "Test error (Mean +- SD): " << averageTestError << " +- " << stdTestError << endl;
         return EXIT_SUCCESS;
     }
     else

@@ -245,7 +245,7 @@ void MultilayerPerceptron::printNetwork()
 {
 	for (int i = 0; i < this->nOfLayers; i++)
 	{
-		cout << "Layer " << i << endl;
+		cout << "\nLayer " << i << endl;
 		for (int j = 0; j < this->layers[i].nOfNeurons; j++)
 		{
 			cout << "[out = " << this->layers[i].neurons[j].out;
