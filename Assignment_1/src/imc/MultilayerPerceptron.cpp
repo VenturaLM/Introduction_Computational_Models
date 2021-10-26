@@ -166,9 +166,8 @@ void MultilayerPerceptron::forwardPropagate()
 		for (auto j = 0; j < layers[i].nOfNeurons; j++)
 		{
 			double sum = 0.0, net = 0.0;
-			for (auto k = 0; k < layers[i - 1].nOfNeurons; k++) // +1 due to the bias.
+			for (auto k = 0; k < layers[i - 1].nOfNeurons; k++) // From 0 to nOfNeurons due to the bias.
 				sum += (layers[i].neurons[j].w[k] * layers[i - 1].neurons[k].out);
-				//sum += (layers[i].neurons[j].w[k] * layers[i - 1].neurons[k - 1].out);
 
 			net = layers[i].neurons[j].w[layers[i - 1].nOfNeurons] + sum;
 			layers[i].neurons[j].out = 1.0 / (1.0 + exp(-net)); // Activation function: Sigmoid.
@@ -220,7 +219,7 @@ void MultilayerPerceptron::accumulateChange()
 			for (auto k = 0; k < layers[i - 1].nOfNeurons; k++)
 				layers[i].neurons[j].deltaW[k] = layers[i].neurons[j].deltaW[k] + layers[i].neurons[j].delta * layers[i - 1].neurons[k].out;
 
-			layers[i].neurons[j].deltaW[layers[i - 1].nOfNeurons] += layers[i].neurons[j].delta; // * 1.0 due to the bias.
+			layers[i].neurons[j].deltaW[layers[i - 1].nOfNeurons] += layers[i].neurons[j].delta;
 		}
 	}
 }
@@ -230,15 +229,9 @@ void MultilayerPerceptron::accumulateChange()
 void MultilayerPerceptron::weightAdjustment()
 {
 	for (auto i = 1; i < nOfLayers; i++)
-	{
 		for (auto j = 0; j < layers[i].nOfNeurons; j++)
-		{
-			for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++) // The bias is set below.
+			for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++)
 				layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - eta * layers[i].neurons[j].deltaW[k] - mu * (eta * layers[i].neurons[j].lastDeltaW[k]);
-
-			//layers[i].neurons[j].w[0] = layers[i].neurons[j].w[0] - eta * layers[i].neurons[j].deltaW[0] - mu * (eta * layers[i].neurons[j].lastDeltaW[0]);
-		}
-	}
 }
 
 // ------------------------------
