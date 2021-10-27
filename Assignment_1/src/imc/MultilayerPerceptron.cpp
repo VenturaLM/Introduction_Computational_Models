@@ -402,16 +402,19 @@ void MultilayerPerceptron::predict(Dataset *testDataset)
 void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Dataset *testDataset, int epochs, double *errorTrain, double *errorTest)
 {
 	int countTrain = 0;
+	int countValidation = 0;
 
 	// Random assignment of weights (starting point)
 	randomWeights();
 
-	double minTrainError = 0;
+	double minTrainError = 0.0;
 	int iterWithoutImproving;
-	double testError = 0;
 
-	int iterWithoutImprovingValidation = 0;
-	double validationError = 1;
+	double testError = 0.0;
+
+	double validationError = 0.0;
+	int iterWithoutImprovingValidation = 0.0;
+	double temp_validationError = 0.0;
 
 	Dataset *validationDataset = new Dataset;
 	bool validation = false;
@@ -446,7 +449,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 				validationDataset->inputs[i][j] = trainDataset->inputs[indexes[i]][j];
 
 			for (auto j = 0; j < validationDataset->nOfOutputs; j++)
-				validationDataset->outputs[i][j] = trainDataset->inputs[indexes[i]][j];
+				validationDataset->outputs[i][j] = trainDataset->outputs[indexes[i]][j];
 		}
 	}
 
@@ -487,8 +490,12 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 		{
 			validationError = test(validationDataset);
 
-			if ((validationError - testError) < 0.00001) // AQUI VA TESTERROR O TRAINING ERROR (?)
+			if (countValidation == 0 or (temp_validationError - validationError) > 0.00001)
+			{
+				countValidation = 1;
+				copyWeights();
 				iterWithoutImprovingValidation = 0;
+			}
 			else
 				iterWithoutImprovingValidation++;
 
@@ -498,6 +505,7 @@ void MultilayerPerceptron::runOnlineBackPropagation(Dataset *trainDataset, Datas
 				restoreWeights();
 				countTrain = epochs;
 			}
+			temp_validationError = validationError;
 		}
 
 		cout << "Iteration " << countTrain << "\t Training error: " << trainError << "\t Validation error: " << validationError << endl;

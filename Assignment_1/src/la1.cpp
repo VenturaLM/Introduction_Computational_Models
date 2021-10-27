@@ -177,8 +177,8 @@ int main(int argc, char **argv)
 
         cout << "\nFINAL REPORT" << endl;
         cout << "************" << endl;
-        cout << "Train error (Mean +- SD): " << averageTrainError << " +- " << stdTrainError << endl;
-        cout << "Test error (Mean +- SD): " << averageTestError << " +- " << stdTestError << endl;
+        cout << "Train error (Mean +- SD):\t" << averageTrainError << " +- " << stdTrainError << endl;
+        cout << "Test error (Mean +- SD):\t" << averageTestError << " +- " << stdTestError << endl;
         return EXIT_SUCCESS;
     }
     else
