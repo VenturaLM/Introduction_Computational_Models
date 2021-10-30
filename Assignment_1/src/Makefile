@@ -1,6 +1,6 @@
 MultilayerPerceptron: la1
 	
-la1: la1.cpp imc/MultilayerPerceptron.cpp
+la1: la1.cpp imc/*
 	g++ -Wall -o3 -g la1.cpp imc/* -o la1
 
 #---------------------------------------------------------
