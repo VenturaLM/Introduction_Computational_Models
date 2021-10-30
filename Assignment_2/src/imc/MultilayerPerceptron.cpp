@@ -38,6 +38,7 @@ double randomDouble(double Low, double High)
 MultilayerPerceptron::MultilayerPerceptron()
 {
 	nOfLayers = 0;
+	nOfTrainingPatterns = 0;
 	layers = nullptr;
 	eta = 0.1;
 	mu = 0.9;
@@ -53,6 +54,7 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 {
 	// Create the layers.
 	nOfLayers = nl;
+	nOfTrainingPatterns = 0;
 	layers = new Layer[nOfLayers];
 
 	//-------
@@ -328,11 +330,21 @@ void MultilayerPerceptron::accumulateChange()
 // Update the network weights, from the first layer to the last one
 void MultilayerPerceptron::weightAdjustment()
 {
-	// TODO
-	for (auto i = 1; i < nOfLayers; i++)
-		for (auto j = 0; j < layers[i].nOfNeurons; j++)
-			for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++)
-				layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - eta * layers[i].neurons[j].deltaW[k] - mu * (eta * layers[i].neurons[j].lastDeltaW[k]);
+	if (online)
+	{
+		for (auto i = 1; i < nOfLayers; i++)
+			for (auto j = 0; j < layers[i].nOfNeurons; j++)
+				for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++) // +1 for the bias.
+					layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - eta * layers[i].neurons[j].deltaW[k] - mu * (eta * layers[i].neurons[j].lastDeltaW[k]);
+	}
+
+	else if (!online)
+	{
+		for (auto i = 1; i < nOfLayers; i++)
+			for (auto j = 0; j < layers[i].nOfNeurons; j++)
+				for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++) // +1 for the bias.
+					layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - (eta * layers[i].neurons[j].deltaW[k] / nOfTrainingPatterns) - (mu * eta * layers[i].neurons[j].lastDeltaW[k] / nOfTrainingPatterns);
+	}
 }
 
 // ------------------------------
