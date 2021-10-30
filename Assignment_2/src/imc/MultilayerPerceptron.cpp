@@ -496,13 +496,10 @@ double MultilayerPerceptron::test(Dataset *dataset, int errorFunction)
 		sum += obtainError(dataset->outputs[i], errorFunction);
 	}
 
-	double errorMetric = 0.0;
 	if (errorFunction)
-		errorMetric = -(1.0 / (double)dataset->nOfPatterns) * sum;
+		return -(1.0 / (double)dataset->nOfPatterns) * sum;
 	else if (!errorFunction)
-		errorMetric = (1.0 / (double)dataset->nOfPatterns) * sum;
-
-	return errorMetric;
+		return (1.0 / (double)dataset->nOfPatterns) * sum;
 }
 
 // ------------------------------
