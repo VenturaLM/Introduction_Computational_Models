@@ -26,14 +26,14 @@ int main(int argc, char **argv)
 {
     // Process arguments of the command line
     bool wflag = false, pflag = false, iflag = false, lflag = false, hflag = false, eflag = false, mflag = false, vflag = false, dflag = false, oflag = false, fflag = false, sflag = false;
-    char *Tvalue = nullptr, *wvalue = nullptr, *tvalue = nullptr, *ivalue = nullptr, *lvalue = nullptr, *hvalue = nullptr, *evalue = nullptr, *mvalue = nullptr, *vvalue = nullptr, *dvalue = nullptr, *fvalue = nullptr, *svalue = nullptr;
+    char *Tvalue = nullptr, *wvalue = nullptr, *tvalue = nullptr, *ivalue = nullptr, *lvalue = nullptr, *hvalue = nullptr, *evalue = nullptr, *mvalue = nullptr, *vvalue = nullptr, *dvalue = nullptr, *fvalue = nullptr;
     int c;
 
     opterr = 0;
 
     // a: Option that requires an argument
     // a:: The argument required is optional
-    while ((c = getopt(argc, argv, "T:w:p:t:i:l:h:e:m:v:d:o::f:s:")) != -1)
+    while ((c = getopt(argc, argv, "T:w:p:t:i:l:h:e:m:v:d:o::f:s::")) != -1)
     {
         // The parameters needed for using the optional prediction mode of Kaggle have been included.
         // You should add the rest of parameters needed for the lab assignment.
@@ -82,7 +82,6 @@ int main(int argc, char **argv)
             break;
         case 's':
             sflag = true;
-            svalue = optarg;
             break;
         case 'w':
             wflag = true;
@@ -92,7 +91,7 @@ int main(int argc, char **argv)
             pflag = true;
             break;
         case '?':
-            if (optopt == 'T' || optopt == 'w' || optopt == 'p' || optopt == 't' || optopt == 'i' || optopt == 'l' || optopt == 'h' || optopt == 'e' || optopt == 'v' || optopt == 'd' || optopt == 'f' || optopt == 's')
+            if (optopt == 'T' || optopt == 'w' || optopt == 'p' || optopt == 't' || optopt == 'i' || optopt == 'l' || optopt == 'h' || optopt == 'e' || optopt == 'v' || optopt == 'd' || optopt == 'f')
                 fprintf(stderr, "The option -%c requires an argument.\n", optopt);
             else if (isprint(optopt))
                 fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -131,7 +130,7 @@ int main(int argc, char **argv)
         // Output function: 0 = sigmoid / 1 = softmax.
         mlp.outputFunction = 0;
         if (sflag)
-            mlp.outputFunction = stoi(svalue);
+            mlp.outputFunction = 1;
 
         // Type of error considered
         int error = 0;

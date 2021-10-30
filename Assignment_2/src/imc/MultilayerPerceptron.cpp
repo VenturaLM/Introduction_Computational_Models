@@ -506,12 +506,31 @@ double MultilayerPerceptron::test(Dataset *dataset, int errorFunction)
 // Test the network with a dataset and return the CCR
 double MultilayerPerceptron::testClassification(Dataset *dataset)
 {
-	// TODO
-	double sum = 0.0;
+	double *datasetOutputs = new double[dataset->nOfOutputs];
+	int tp = 0;
+
 	for (auto i = 0; i < dataset->nOfPatterns; i++)
 	{
-		//
+		feedInputs(dataset->inputs[i]);
+		forwardPropagate();
+		getOutputs(datasetOutputs);
+
+		int classification_index = 0;
+		int obtained_index = 0;
+		for (auto j = 0; j < dataset->nOfOutputs; j++)
+		{
+			if (dataset->outputs[i][j] > dataset->outputs[i][classification_index])
+				classification_index = j;
+
+			if (datasetOutputs[j] > datasetOutputs[obtained_index])
+				obtained_index = j;
+		}
+
+		if (classification_index == obtained_index)
+			tp += 1;
 	}
+
+	return 100.0 * (double)tp / (double)dataset->nOfPatterns;
 }
 
 // ------------------------------
@@ -673,7 +692,6 @@ void MultilayerPerceptron::runBackPropagation(Dataset *trainDataset, Dataset *te
 	}
 
 	*errorTest = test(testDataset, errorFunction);
-	;
 	*errorTrain = minTrainError;
 	*ccrTest = testClassification(testDataset);
 	*ccrTrain = testClassification(trainDataset);
