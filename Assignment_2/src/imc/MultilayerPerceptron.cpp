@@ -128,7 +128,7 @@ void MultilayerPerceptron::randomWeights()
 		{
 			for (auto k = 0; k < layers[i - 1].nOfNeurons; k++)
 			{
-				layers[i].neurons[j].w[k] = ((double)rand() / (double)RAND_MAX) * (b - a) + a;
+				layers[i].neurons[j].w[k] = randomDouble(-1, 1);
 				layers[i].neurons[j].deltaW[k] = 0.0;
 				layers[i].neurons[j].lastDeltaW[k] = 0.0;
 				layers[i].neurons[j].wCopy[k] = 0.0;
@@ -496,9 +496,9 @@ double MultilayerPerceptron::test(Dataset *dataset, int errorFunction)
 		sum += obtainError(dataset->outputs[i], errorFunction);
 	}
 
-	if (errorFunction)
+	if (errorFunction) // Cross Entropy.
 		return -(1.0 / (double)dataset->nOfPatterns) * sum;
-	else if (!errorFunction)
+	else if (!errorFunction) // MSE.
 		return (1.0 / (double)dataset->nOfPatterns) * sum;
 }
 
@@ -506,14 +506,14 @@ double MultilayerPerceptron::test(Dataset *dataset, int errorFunction)
 // Test the network with a dataset and return the CCR
 double MultilayerPerceptron::testClassification(Dataset *dataset)
 {
-	double *datasetOutputs = new double[dataset->nOfOutputs];
+	double *confusionMatrix = new double[dataset->nOfOutputs];
 	int tp = 0;
 
 	for (auto i = 0; i < dataset->nOfPatterns; i++)
 	{
 		feedInputs(dataset->inputs[i]);
 		forwardPropagate();
-		getOutputs(datasetOutputs);
+		getOutputs(confusionMatrix);
 
 		int classification_index = 0;
 		int obtained_index = 0;
@@ -522,7 +522,7 @@ double MultilayerPerceptron::testClassification(Dataset *dataset)
 			if (dataset->outputs[i][j] > dataset->outputs[i][classification_index])
 				classification_index = j;
 
-			if (datasetOutputs[j] > datasetOutputs[obtained_index])
+			if (confusionMatrix[j] > confusionMatrix[obtained_index])
 				obtained_index = j;
 		}
 
