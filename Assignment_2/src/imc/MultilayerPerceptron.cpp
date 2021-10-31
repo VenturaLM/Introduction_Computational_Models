@@ -4,7 +4,6 @@
 *********************************************************************/
 
 #include "MultilayerPerceptron.h"
-
 #include "util.h"
 
 #include <iostream>
@@ -120,8 +119,6 @@ void MultilayerPerceptron::freeMemory()
 // Fill all the weights (w) with random numbers between -1 and +1
 void MultilayerPerceptron::randomWeights()
 {
-	int a = -1.0, b = 1.0;
-
 	for (auto i = 1; i < nOfLayers; i++)
 	{
 		for (auto j = 0; j < layers[i].nOfNeurons; j++)
