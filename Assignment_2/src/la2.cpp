@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 			srand(seeds[i]);
 
 			mlp.runBackPropagation(trainDataset, testDataset, maxIter, &(trainErrors[i]), &(testErrors[i]), &(trainCCRs[i]), &(testCCRs[i]), error);
-			//cout << "We end!! => Final test CCR: " << testCCRs[i] << endl;
+			cout << "We end!! => Final test CCR: " << testCCRs[i] << endl;
 
 			// We save the weights every time we find a better model
 			if (wflag && testErrors[i] <= bestTestError)

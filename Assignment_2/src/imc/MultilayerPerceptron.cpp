@@ -37,7 +37,7 @@ double randomDouble(double Low, double High)
 MultilayerPerceptron::MultilayerPerceptron()
 {
 	nOfLayers = 0;
-	nOfTrainingPatterns = 0;
+	nOfTrainingPatterns = 1;
 	layers = nullptr;
 	eta = 0.1;
 	mu = 0.9;
