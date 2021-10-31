@@ -494,9 +494,9 @@ double MultilayerPerceptron::test(Dataset *dataset, int errorFunction)
 	}
 
 	if (errorFunction) // Cross Entropy.
-		return -(1.0 / (double)dataset->nOfPatterns) * sum;
+		return -(sum / (double)dataset->nOfPatterns);
 	else if (!errorFunction) // MSE.
-		return (1.0 / (double)dataset->nOfPatterns) * sum;
+		return (sum / (double)dataset->nOfPatterns);
 }
 
 // ------------------------------
@@ -633,7 +633,7 @@ void MultilayerPerceptron::runBackPropagation(Dataset *trainDataset, Dataset *te
 
 		if (iterWithoutImproving == 50)
 		{
-			cout << "We exit because the training is not improving!!" << endl;
+			//cout << "We exit because the training is not improving!!" << endl;
 			restoreWeights();
 			countTrain = maxiter;
 		}
@@ -655,25 +655,33 @@ void MultilayerPerceptron::runBackPropagation(Dataset *trainDataset, Dataset *te
 				iterWithoutImprovingValidation++;
 			if (iterWithoutImprovingValidation == 50)
 			{
-				cout << "We exit because validation is not improving!!" << endl;
+				//cout << "We exit because validation is not improving!!" << endl;
 				restoreWeights();
 				countTrain = maxiter;
 			}
 		}
 
-		cout << "Iteration " << countTrain << "\t Training error: " << trainError << "\t Validation error: " << validationError << endl;
+		if (countTrain == 1)
+		{
+			cout << "Iteration"
+				 << "\t Training error"
+				 << "\t Validation error " << endl;
+			cout << countTrain << "\t" << trainError << "\t" << validationError << endl;
+		}
+		else
+			cout << countTrain << "\t" << trainError << "\t" << validationError << endl;
 
 	} while (countTrain < maxiter);
 
 	if ((iterWithoutImprovingValidation != 50) && (iterWithoutImproving != 50))
 		restoreWeights();
 
-	cout << "NETWORK WEIGHTS" << endl;
-	cout << "===============" << endl;
-	printNetwork();
+	//cout << "NETWORK WEIGHTS" << endl;
+	//cout << "===============" << endl;
+	//printNetwork();
 
-	cout << "Desired output Vs Obtained output (test)" << endl;
-	cout << "=========================================" << endl;
+	//cout << "Desired output Vs Obtained output (test)" << endl;
+	//cout << "=========================================" << endl;
 	for (int i = 0; i < testDataset->nOfPatterns; i++)
 	{
 		double *prediction = new double[testDataset->nOfOutputs];

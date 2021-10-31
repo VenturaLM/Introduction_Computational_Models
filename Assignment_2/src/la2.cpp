@@ -181,12 +181,13 @@ int main(int argc, char **argv)
 		double bestTestError = DBL_MAX;
 		for (int i = 0; i < 5; i++)
 		{
-			cout << "**********" << endl;
-			cout << "SEED " << seeds[i] << endl;
-			cout << "**********" << endl;
+			//cout << "**********" << endl;
+			//cout << "SEED " << seeds[i] << endl;
+			//cout << "**********" << endl;
 			srand(seeds[i]);
+
 			mlp.runBackPropagation(trainDataset, testDataset, maxIter, &(trainErrors[i]), &(testErrors[i]), &(trainCCRs[i]), &(testCCRs[i]), error);
-			cout << "We end!! => Final test CCR: " << testCCRs[i] << endl;
+			//cout << "We end!! => Final test CCR: " << testCCRs[i] << endl;
 
 			// We save the weights every time we find a better model
 			if (wflag && testErrors[i] <= bestTestError)
