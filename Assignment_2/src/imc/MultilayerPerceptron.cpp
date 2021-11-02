@@ -53,7 +53,7 @@ int MultilayerPerceptron::initialize(int nl, int npl[])
 {
 	// Create the layers.
 	nOfLayers = nl;
-	nOfTrainingPatterns = 0;
+	nOfTrainingPatterns = 1;
 	layers = new Layer[nOfLayers];
 
 	//-------
@@ -174,7 +174,7 @@ void MultilayerPerceptron::restoreWeights()
 // Calculate and propagate the outputs of the neurons, from the first layer until the last one -->-->
 void MultilayerPerceptron::forwardPropagate()
 {
-	if (!online)
+	if (!outputFunction)
 	{
 		for (auto i = 1; i < nOfLayers; i++)
 		{
@@ -190,9 +190,9 @@ void MultilayerPerceptron::forwardPropagate()
 		}
 	}
 
-	else if (online)
+	else if (outputFunction)
 	{
-		for (auto i = 1; i < nOfLayers - 1; i++) // Until penultimate.
+		for (auto i = 1; i < nOfLayers - 1; i++) // Until penultimate, due to the softmax.
 		{
 			for (auto j = 0; j < layers[i].nOfNeurons; j++)
 			{
@@ -215,7 +215,7 @@ void MultilayerPerceptron::forwardPropagate()
 			net_sum += exp(net[i]);
 
 		for (auto i = 0; i < layers[nOfLayers - 1].nOfNeurons; i++)
-			layers[nOfLayers - 1].neurons[i].out = exp(net[i]) / net_sum; // Softmax
+			layers[nOfLayers - 1].neurons[i].out = exp(net[i]) / net_sum; // Softmax.
 	}
 }
 
@@ -263,12 +263,12 @@ void MultilayerPerceptron::backpropagateError(double *target, int errorFunction)
 
 	else if (outputFunction) // Softmax.
 	{
-		double sum = 0.0;
 		int I = 0;
 		if (!errorFunction) // MSE.
 		{
 			for (auto i = 0; i < layers[nOfLayers - 1].nOfNeurons; i++)
 			{
+				double sum = 0.0;
 				for (auto j = 0; j < layers[nOfLayers - 1].nOfNeurons; j++)
 				{
 					I = (i == j) ? 1 : 0;
@@ -283,6 +283,7 @@ void MultilayerPerceptron::backpropagateError(double *target, int errorFunction)
 		{
 			for (auto i = 0; i < layers[nOfLayers - 1].nOfNeurons; i++)
 			{
+				double sum = 0.0;
 				for (auto j = 0; j < layers[nOfLayers - 1].nOfNeurons; j++)
 				{
 					I = (i == j) ? 1 : 0;
@@ -294,7 +295,7 @@ void MultilayerPerceptron::backpropagateError(double *target, int errorFunction)
 		}
 	}
 
-	for (auto h = nOfLayers - 2; h >= 0; h--) // Hidden layers.
+	for (auto h = nOfLayers - 2; h > 0; h--) // Hidden layers.
 	{
 		for (auto j = 0; j < layers[h].nOfNeurons; j++)
 		{
@@ -302,7 +303,7 @@ void MultilayerPerceptron::backpropagateError(double *target, int errorFunction)
 			for (auto k = 0; k < layers[h + 1].nOfNeurons; k++)
 				sum += layers[h + 1].neurons[k].w[j] * layers[h + 1].neurons[k].delta;
 
-			layers[h].neurons[j].delta = sum * layers[h].neurons[j].out * (1 - layers[h].neurons[j].out);
+			layers[h].neurons[j].delta = sum * layers[h].neurons[j].out * (1.0 - layers[h].neurons[j].out);
 		}
 	}
 }
@@ -316,7 +317,7 @@ void MultilayerPerceptron::accumulateChange()
 		for (auto j = 0; j < layers[i].nOfNeurons; j++)
 		{
 			for (auto k = 0; k < layers[i - 1].nOfNeurons; k++)
-				layers[i].neurons[j].deltaW[k] = layers[i].neurons[j].deltaW[k] + layers[i].neurons[j].delta * layers[i - 1].neurons[k].out;
+				layers[i].neurons[j].deltaW[k] += layers[i].neurons[j].delta * layers[i - 1].neurons[k].out;
 
 			layers[i].neurons[j].deltaW[layers[i - 1].nOfNeurons] += layers[i].neurons[j].delta;
 		}
@@ -330,17 +331,37 @@ void MultilayerPerceptron::weightAdjustment()
 	if (online)
 	{
 		for (auto i = 1; i < nOfLayers; i++)
+		{
+			double f = pow(decrementFactor, -(nOfLayers - i)) * eta;
 			for (auto j = 0; j < layers[i].nOfNeurons; j++)
+			{
 				for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++) // +1 for the bias.
-					layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - eta * layers[i].neurons[j].deltaW[k] - mu * (eta * layers[i].neurons[j].lastDeltaW[k]);
+				{
+					double temp = layers[i].neurons[j].deltaW[k];
+					layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - f * layers[i].neurons[j].deltaW[k] - mu * layers[i].neurons[j].lastDeltaW[k];
+
+					layers[i].neurons[j].lastDeltaW[k] = temp;
+				}
+			}
+		}
 	}
 
 	else if (!online)
 	{
 		for (auto i = 1; i < nOfLayers; i++)
+		{
+			double f = pow(decrementFactor, -(nOfLayers - i)) * eta;
 			for (auto j = 0; j < layers[i].nOfNeurons; j++)
+			{
 				for (auto k = 0; k < layers[i - 1].nOfNeurons + 1; k++) // +1 for the bias.
-					layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - (eta * layers[i].neurons[j].deltaW[k] / nOfTrainingPatterns) - (mu * eta * layers[i].neurons[j].lastDeltaW[k] / nOfTrainingPatterns);
+				{
+					double temp = layers[i].neurons[j].deltaW[k];
+					layers[i].neurons[j].w[k] = layers[i].neurons[j].w[k] - ((f * layers[i].neurons[j].deltaW[k] + mu * layers[i].neurons[j].lastDeltaW[k]) / nOfTrainingPatterns);
+
+					layers[i].neurons[j].lastDeltaW[k] = temp;
+				}
+			}
+		}
 	}
 }
 
@@ -504,7 +525,7 @@ double MultilayerPerceptron::test(Dataset *dataset, int errorFunction)
 double MultilayerPerceptron::testClassification(Dataset *dataset)
 {
 	double *confusionMatrix = new double[dataset->nOfOutputs];
-	int tp = 0;
+	int tp = 0; // True Positives.
 
 	for (auto i = 0; i < dataset->nOfPatterns; i++)
 	{
@@ -514,7 +535,7 @@ double MultilayerPerceptron::testClassification(Dataset *dataset)
 
 		int classification_index = 0;
 		int obtained_index = 0;
-		for (auto j = 0; j < dataset->nOfOutputs; j++)
+		for (auto j = 1; j < dataset->nOfOutputs; j++)
 		{
 			if (dataset->outputs[i][j] > dataset->outputs[i][classification_index])
 				classification_index = j;

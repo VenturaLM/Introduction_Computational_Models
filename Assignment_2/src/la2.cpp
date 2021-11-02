@@ -206,8 +206,8 @@ int main(int argc, char **argv)
 		computeAverageErrors(testErrors, trainErrors, testAverageError, trainAverageError);
 		computeStdErrors(testErrors, trainErrors, testStdError, trainStdError, testAverageError, trainAverageError);
 
-		computeAverageErrors(testErrors, trainErrors, testAverageCCR, trainAverageCCR);
-		computeStdErrors(testErrors, trainErrors, testStdCCR, trainStdCCR, testAverageCCR, trainAverageCCR);
+		computeAverageErrors(testCCRs, trainCCRs, testAverageCCR, trainAverageCCR);
+		computeStdErrors(testCCRs, trainCCRs, testStdCCR, trainStdCCR, testAverageCCR, trainAverageCCR);
 
 		cout << "WE HAVE FINISHED WITH ALL THE SEEDS" << endl;
 
