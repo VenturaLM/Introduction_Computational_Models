@@ -206,9 +206,12 @@ void MultilayerPerceptron::forwardPropagate()
 		}
 
 		double *net = new double[layers[nOfLayers - 1].nOfNeurons];
+		for (auto j = 0; j < layers[nOfLayers - 1].nOfNeurons; j++)
+			net[j] = 0;
+
 		for (auto i = 0; i < layers[nOfLayers - 1].nOfNeurons; i++)
 			for (auto j = 0; j < layers[nOfLayers - 1].nOfNeurons; j++)
-				net[i] += layers[nOfLayers - 1].neurons[i].w[j] * layers[nOfLayers - 2].neurons[i].out;
+				net[i] += layers[nOfLayers - 1].neurons[i].w[j] * layers[nOfLayers - 2].neurons[j].out;
 
 		double net_sum = 0.0;
 		for (auto i = 0; i < layers[nOfLayers - 1].nOfNeurons; i++)
