@@ -227,7 +227,7 @@ int main(int argc, char **argv)
 		// Calculating total time taken by the program.
 		double time_taken = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
 		time_taken *= 1e-9;
-		cout << "Time taken: " << time_taken << "sec." << endl;
+		cout << "Time taken: " << time_taken << " sec." << endl;
 		return EXIT_SUCCESS;
 	}
 	else

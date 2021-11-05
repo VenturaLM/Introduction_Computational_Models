@@ -1,0 +1,4 @@
+Train error (Mean +- SD): 0.0472092 +- 0.00565299
+Test error (Mean +- SD): 0.1048 +- 0.00802431
+Train CCR (Mean +- SD): 91.2667 +- 1.55651
+Test CCR (Mean +- SD): 82.6667 +- 1.29957
