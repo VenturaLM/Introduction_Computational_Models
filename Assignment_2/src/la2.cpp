@@ -16,6 +16,8 @@
 #include <string.h>
 #include <math.h>
 #include <float.h> // For DBL_MAX
+#include <iomanip> //setprecision
+#include <chrono>  // high resolution clock
 
 #include "imc/MultilayerPerceptron.h"
 #include "imc/util.h"
@@ -26,6 +28,7 @@ using namespace util;
 
 int main(int argc, char **argv)
 {
+	auto start = chrono::high_resolution_clock::now();
 	// Process arguments of the command line
 	bool wflag = false, pflag = false, iflag = false, lflag = false, hflag = false, eflag = false, mflag = false, vflag = false, dflag = false, oflag = false, fflag = false, sflag = false;
 	char *Tvalue = nullptr, *wvalue = nullptr, *tvalue = nullptr, *ivalue = nullptr, *lvalue = nullptr, *hvalue = nullptr, *evalue = nullptr, *mvalue = nullptr, *vvalue = nullptr, *dvalue = nullptr, *fvalue = nullptr;
@@ -217,6 +220,14 @@ int main(int argc, char **argv)
 		cout << "Test error (Mean +- SD): " << testAverageError << " +- " << testStdError << endl;
 		cout << "Train CCR (Mean +- SD): " << trainAverageCCR << " +- " << trainStdCCR << endl;
 		cout << "Test CCR (Mean +- SD): " << testAverageCCR << " +- " << testStdCCR << endl;
+
+		// End time.
+		auto end = chrono::high_resolution_clock::now();
+		cout << setprecision(9) << fixed;
+		// Calculating total time taken by the program.
+		double time_taken = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+		time_taken *= 1e-9;
+		cout << "Time taken: " << time_taken << "sec." << endl;
 		return EXIT_SUCCESS;
 	}
 	else
