@@ -1,0 +1,4 @@
+Train error (Mean +- SD): 8.29771e-06 +- 5.80867e-06
+Test error (Mean +- SD): 8.29771e-06 +- 5.80867e-06
+Train CCR (Mean +- SD): 50 +- 0
+Test CCR (Mean +- SD): 50 +- 0
