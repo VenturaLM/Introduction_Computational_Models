@@ -291,6 +291,8 @@ def calculate_radii(centers, num_rbf):
     """
 
     #TODO: Complete the code of the function
+    # euclidean_pdist().
+    # for instance np.mean( M[:,0])
     return radii
 
 def calculate_r_matrix(distances, radii):
