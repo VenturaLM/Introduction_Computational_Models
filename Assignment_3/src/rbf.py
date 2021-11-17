@@ -22,7 +22,7 @@ import os
               help=u'Use the prediction mode.') # KAGGLE
 @click.option('--model', '-m', default="", show_default=False,
               help=u'Directory name to save the models (or name of the file to load the model, if the prediction mode is active).') # KAGGLE
-def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model, pred):
+def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model, pred): # eta = C in scikit-learn documentation of logisticregression.
     """ 5 executions of RBFNN training
     
         RBF neural network based on hybrid supervised/unsupervised training.
