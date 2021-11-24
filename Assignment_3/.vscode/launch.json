@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: RBF",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/rbf.py",
+            "program": "${workspaceFolder}/src/rbf.py",
             "console": "integratedTerminal",
             "args": [
                 "-t",
-                "../datasets/csv/train_sin.csv",
+                "datasets/csv/train_sin.csv",
                 "-T",
-                "../datasets/csv/test_sin.csv"
+                "datasets/csv/test_sin.csv"
             ]
         }
     ]

@@ -6,6 +6,7 @@ Created on Sun Oct 25 12:37:04 2021
 IMC: lab assignment 3
 
 @author: pagutierrez
+@author: Ventura Lucena Martínez
 """
 
 import pickle
@@ -13,44 +14,38 @@ import os
 import click
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.cluster import KMeans
+
 
 @click.command()
-
 @click.option('--train_file', '-t', default=None, required=True,
               help=u'Name of the file with training data.')
-
 @click.option('--test_file', '-T', default=None, required=False,
               help=u'Name of the file with test data.')
-
-@click.option('--classification', '-c', is_flag = True, default=False, show_default=True, required=False,
+@click.option('--classification', '-c', is_flag=True, default=False, show_default=True, required=False,
               help=u'Boolean that indicates wether it is a classification problem or not.')
-
 @click.option('--ratio_rbf', '-r', default=0.1, show_default=True, required=False,
               help=u'Indicates the radius (by one) of RBF neurons with respect to the total number of patterns in training.')
-
 @click.option('--l2', '-l', default=None, required=False,
               help=u'Boolean that indicates if L2 regularization is used. If it is not specified, L1 will be used.')
-
 @click.option('--eta', '-e', default=1e-2, show_default=True, required=False,
               help=u'Indicates the value for eta (η) parameter.')
-
 @click.option('--outputs', '-o', default=1, show_default=True, required=False,
               help=u'Indicates the number of output columns of the dataset (always placed at the end).')
-
 @click.option('--pred', '-p', is_flag=True, default=False, show_default=True,
-              help=u'Use the prediction mode.') # KAGGLE
-
+              help=u'Use the prediction mode.')  # KAGGLE
 @click.option('--model', '-m', default="", show_default=False,
-              help=u'Directory name to save the models (or name of the file to load the model, if the prediction mode is active).') # KAGGLE
-
-def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model, pred): # eta = C in scikit-learn documentation of logisticregression.
+              help=u'Directory name to save the models (or name of the file to load the model, if the prediction mode is active).')  # KAGGLE
+# eta = C in scikit-learn documentation of logisticregression.
+def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model, pred):
     """ 5 executions of RBFNN training
-    
+
         RBF neural network based on hybrid supervised/unsupervised training.
         We run 5 executions with different seeds.
     """
 
-    if not pred:    
+    if not pred:
 
         if train_file is None:
             print("You have not specified the training file (-t)")
@@ -60,28 +55,31 @@ def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, o
         train_ccrs = np.empty(5)
         test_mses = np.empty(5)
         test_ccrs = np.empty(5)
-    
-        for s in range(1,6,1):   
+
+        for s in range(1, 6, 1):
             print("-----------")
             print("Seed: %d" % s)
-            print("-----------")     
+            print("-----------")
             np.random.seed(s)
             train_mses[s-1], test_mses[s-1], train_ccrs[s-1], test_ccrs[s-1] = \
-                train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, \
-                             model and "{}/{}.pickle".format(model, s) or "")
+                train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs,
+                          model and "{}/{}.pickle".format(model, s) or "")
             print("Training MSE: %f" % train_mses[s-1])
             print("Test MSE: %f" % test_mses[s-1])
             print("Training CCR: %.2f%%" % train_ccrs[s-1])
             print("Test CCR: %.2f%%" % test_ccrs[s-1])
-        
+
         print("******************")
         print("Summary of results")
         print("******************")
-        print("Training MSE: %f +- %f" % (np.mean(train_mses), np.std(train_mses)))
+        print("Training MSE: %f +- %f" %
+              (np.mean(train_mses), np.std(train_mses)))
         print("Test MSE: %f +- %f" % (np.mean(test_mses), np.std(test_mses)))
-        print("Training CCR: %.2f%% +- %.2f%%" % (np.mean(train_ccrs), np.std(train_ccrs)))
-        print("Test CCR: %.2f%% +- %.2f%%" % (np.mean(test_ccrs), np.std(test_ccrs)))
-            
+        print("Training CCR: %.2f%% +- %.2f%%" %
+              (np.mean(train_ccrs), np.std(train_ccrs)))
+        print("Test CCR: %.2f%% +- %.2f%%" %
+              (np.mean(test_ccrs), np.std(test_ccrs)))
+
     else:
         # KAGGLE
         if model is None:
@@ -94,22 +92,21 @@ def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, o
         # Print the predictions in csv format
         print("Id,Category")
         for prediction, index in zip(predictions, range(len(predictions))):
-            s = ""            
+            s = ""
             s += str(index)
-            
+
             if isinstance(prediction, np.ndarray):
                 for output in prediction:
                     s += ",{}".format(output)
             else:
                 s += ",{}".format(int(prediction))
-                
+
             print(s)
-            
 
 
 def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model_file=""):
     """ One execution of RBFNN training
-    
+
         RBF neural network based on hybrid supervised/unsupervised training.
         We run 1 executions.
 
@@ -152,19 +149,19 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
             Training accuracy (CCR) of the model 
             For regression, we will return a 0
     """
-    train_inputs, train_outputs, test_inputs, test_outputs = read_data(train_file, 
-                                                                        test_file,
-                                                                        outputs)
+    train_inputs, train_outputs, test_inputs, test_outputs = read_data(train_file,
+                                                                       test_file,
+                                                                       outputs)
 
     # [x] TODO: Obtain num_rbf from ratio_rbf
     num_rbf = ratio_rbf * len(train_inputs)
 
-    print("Number of RBFs used: %d" %(num_rbf))
-    kmeans, distances, centers = clustering(classification, train_inputs, 
-                                              train_outputs, num_rbf)
-    
+    print("Number of RBFs used: %d" % (num_rbf))
+    kmeans, distances, centers = clustering(classification, train_inputs,
+                                            train_outputs, num_rbf)
+
     radii = calculate_radii(centers, num_rbf)
-    
+
     r_matrix = calculate_r_matrix(distances, radii)
 
     if not classification:
@@ -180,9 +177,9 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
     # # # # KAGGLE # # # #
     if model_file != "":
         save_obj = {
-            'classification' : classification,            
-            'radii' : radii,
-            'kmeans' : kmeans
+            'classification': classification,
+            'radii': radii,
+            'kmeans': kmeans
         }
         if not classification:
             save_obj['coefficients'] = coefficients
@@ -195,7 +192,7 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
 
         with open(model_file, 'wb') as f:
             pickle.dump(save_obj, f)
-    
+
     # # # # # # # # # # #
 
     if not classification:
@@ -212,6 +209,7 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
 
     return train_mse, test_mse, train_ccr, test_ccr
 
+
 def read_data(train_file, test_file, outputs):
     """ Read the input data
         It receives the name of the input data file names (training and test)
@@ -226,7 +224,7 @@ def read_data(train_file, test_file, outputs):
         outputs: int
             Number of variables to be used as outputs
             (all at the end of the matrix).
-              
+
         Returns
         -------
         train_inputs: array, shape (n_train_patterns,n_inputs)
@@ -239,11 +237,21 @@ def read_data(train_file, test_file, outputs):
             Matrix containing the outputs for the test patterns
     """
 
-    # [] TODO: Complete the code of the function
-    train_inputs = pd.read_csv(train_file, header=None)
-    print(train_inputs)
+    # [x] TODO: Complete the code of the function
+    train_df = pd.read_csv(train_file, header=None)
+    test_df = pd.read_csv(test_file, header=None)
+
+    train_np = train_df.to_numpy()
+    test_np = test_df.to_numpy()
+
+    train_inputs = train_np[:, 0:-outputs]
+    train_outputs = train_np[:, train_inputs.shape[1]]
+
+    test_inputs = test_np[:, 0:-outputs]
+    test_outputs = test_np[:, test_inputs.shape[1]]
 
     return train_inputs, train_outputs, test_inputs, test_outputs
+
 
 def init_centroids_classification(train_inputs, train_outputs, num_rbf):
     """ Initialize the centroids for the case of classification
@@ -257,15 +265,20 @@ def init_centroids_classification(train_inputs, train_outputs, num_rbf):
             Matrix with the outputs of the dataset
         num_rbf: int
             Number of RBFs to be used in the network
-            
+
         Returns
         -------
         centroids: array, shape (num_rbf,n_inputs)
             Matrix with all the centroids already selected
     """
-    
-    #TODO: Complete the code of the function
+
+    # [x] TODO: Complete the code of the function
+    x_train, x_test, y_train, y_test = train_test_split(
+        train_inputs, train_outputs, train_size=num_rbf, stratify=train_outputs)
+
+    centroids = x_train
     return centroids
+
 
 def clustering(classification, train_inputs, train_outputs, num_rbf):
     """ It applies the clustering process
@@ -284,7 +297,7 @@ def clustering(classification, train_inputs, train_outputs, num_rbf):
             Matrix with the outputs of the dataset
         num_rbf: int
             Number of RBFs to be used in the network
-            
+
         Returns
         -------
         kmeans: sklearn.cluster.KMeans
@@ -295,8 +308,23 @@ def clustering(classification, train_inputs, train_outputs, num_rbf):
             Centers after the clustering
     """
 
-    #TODO: Complete the code of the function
+    # [x] TODO: Complete the code of the function
+    if classification:
+        centroids = init_centroids_classification(
+            train_inputs, train_outputs, num_rbf)
+        kmeans = KMeans(n_clusters=num_rbf, init=centroids,
+                        n_init=1, max_iter=500)
+    else:
+        kmeans = KMeans(n_clusters=num_rbf, init='random',
+                        n_init=1, max_iter=500)
+
+    kmeans.fit(train_inputs)
+
+    distances = kmeans.transform(train_inputs)
+    centers = kmeans.cluster_centers_
+
     return kmeans, distances, centers
+
 
 def calculate_radii(centers, num_rbf):
     """ It obtains the value of the radii after clustering
@@ -309,31 +337,32 @@ def calculate_radii(centers, num_rbf):
             Centers from which obtain the radii
         num_rbf: int
             Number of RBFs to be used in the network
-            
+
         Returns
         -------
         radii: array, shape (num_rbf,)
             Array with the radius of each RBF
     """
 
-    #TODO: Complete the code of the function
+    # TODO: Complete the code of the function
     # euclidean_pdist().
     # for instance np.mean( M[:,0])
     return radii
+
 
 def calculate_r_matrix(distances, radii):
     """ It obtains the R matrix
         This method obtains the R matrix (as explained in the slides),
         which contains the activation of each RBF for each pattern, including
         a final column with ones, to simulate bias
-        
+
         Parameters
         ----------
         distances: array, shape (n_patterns,num_rbf)
             Matrix with the distance from each pattern to each RBF center
         radii: array, shape (num_rbf,)
             Array with the radius of each RBF
-            
+
         Returns
         -------
         r_matrix: array, shape (n_patterns,num_rbf+1)
@@ -341,15 +370,16 @@ def calculate_r_matrix(distances, radii):
             we include a last column with ones, which is going to act as bias
     """
 
-    #TODO: Complete the code of the function
+    # TODO: Complete the code of the function
     return r_matrix
+
 
 def invert_matrix_regression(r_matrix, train_outputs):
     """ Inversion of the matrix for regression case
         This method obtains the pseudoinverse of the r matrix and multiplies
         it by the targets to obtain the coefficients in the case of linear
         regression
-        
+
         Parameters
         ----------
         r_matrix: array, shape (n_patterns,num_rbf+1)
@@ -357,7 +387,7 @@ def invert_matrix_regression(r_matrix, train_outputs):
             we include a last column with ones, which is going to act as bias
         train_outputs: array, shape (n_patterns,n_outputs)
             Matrix with the outputs of the dataset
-              
+
         Returns
         -------
         coefficients: array, shape (n_outputs,num_rbf+1)
@@ -365,14 +395,15 @@ def invert_matrix_regression(r_matrix, train_outputs):
             of the bias 
     """
 
-    #TODO: Complete the code of the function
+    # TODO: Complete the code of the function
     return coefficients
+
 
 def logreg_classification(matriz_r, train_outputs, l2, eta):
     """ Performs logistic regression training for the classification case
         It trains a logistic regression object to perform classification based
         on the R matrix (activations of the RBFs together with the bias)
-        
+
         Parameters
         ----------
         r_matrix: array, shape (n_patterns,num_rbf+1)
@@ -385,14 +416,14 @@ def logreg_classification(matriz_r, train_outputs, l2, eta):
             False if we want to use L1 regularization for logistic regression
         eta: float
             Value of the regularization factor for logistic regression
-              
+
         Returns
         -------
         logreg: sklearn.linear_model.LogisticRegression
             Scikit-learn logistic regression model already trained
     """
 
-    #TODO: Complete the code of the function
+    # TODO: Complete the code of the function
     return logreg
 
 
@@ -415,25 +446,26 @@ def predict(test_file, model_file):
     """
     test_df = pd.read_csv(test_file, header=None)
     test_inputs = test_df.values[:, :]
-    
+
     with open(model_file, 'rb') as f:
         saved_data = pickle.load(f)
-    
+
     radii = saved_data['radii']
     classification = saved_data['classification']
     kmeans = saved_data['kmeans']
-    
-    test_distancias = kmeans.transform(test_inputs)    
-    test_r = calculate_r_matrix(test_distancias, radii)    
-    
+
+    test_distancias = kmeans.transform(test_inputs)
+    test_r = calculate_r_matrix(test_distancias, radii)
+
     if classification:
         logreg = saved_data['logreg']
         test_predictions = logreg.predict(test_r)
     else:
         coeficientes = saved_data['coefficients']
         test_predictions = np.dot(test_r, coeficientes)
-        
+
     return test_predictions
-    
+
+
 if __name__ == "__main__":
     train_rbf_total()
