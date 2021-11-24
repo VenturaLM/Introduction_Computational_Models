@@ -8,20 +8,41 @@ IMC: lab assignment 3
 @author: pagutierrez
 """
 
-# TODO Include all neccesary imports
 import pickle
 import os
+import click
+import numpy as np
+import pandas as pd
 
 @click.command()
-@click.option('--train_file', '-t', default=None, required=False,
+
+@click.option('--train_file', '-t', default=None, required=True,
               help=u'Name of the file with training data.')
 
-# TODO Include the rest of parameters...
+@click.option('--test_file', '-T', default=None, required=False,
+              help=u'Name of the file with test data.')
+
+@click.option('--classification', '-c', is_flag = True, default=False, show_default=True, required=False,
+              help=u'Boolean that indicates wether it is a classification problem or not.')
+
+@click.option('--ratio_rbf', '-r', default=0.1, show_default=True, required=False,
+              help=u'Indicates the radius (by one) of RBF neurons with respect to the total number of patterns in training.')
+
+@click.option('--l2', '-l', default=None, required=False,
+              help=u'Boolean that indicates if L2 regularization is used. If it is not specified, L1 will be used.')
+
+@click.option('--eta', '-e', default=1e-2, show_default=True, required=False,
+              help=u'Indicates the value for eta (η) parameter.')
+
+@click.option('--outputs', '-o', default=1, show_default=True, required=False,
+              help=u'Indicates the number of output columns of the dataset (always placed at the end).')
 
 @click.option('--pred', '-p', is_flag=True, default=False, show_default=True,
               help=u'Use the prediction mode.') # KAGGLE
+
 @click.option('--model', '-m', default="", show_default=False,
               help=u'Directory name to save the models (or name of the file to load the model, if the prediction mode is active).') # KAGGLE
+
 def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model, pred): # eta = C in scikit-learn documentation of logisticregression.
     """ 5 executions of RBFNN training
     
@@ -135,7 +156,9 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
                                                                         test_file,
                                                                         outputs)
 
-    #TODO: Obtain num_rbf from ratio_rbf
+    # [x] TODO: Obtain num_rbf from ratio_rbf
+    num_rbf = ratio_rbf * len(train_inputs)
+
     print("Number of RBFs used: %d" %(num_rbf))
     kmeans, distances, centers = clustering(classification, train_inputs, 
                                               train_outputs, num_rbf)
@@ -216,7 +239,10 @@ def read_data(train_file, test_file, outputs):
             Matrix containing the outputs for the test patterns
     """
 
-    #TODO: Complete the code of the function
+    # [] TODO: Complete the code of the function
+    train_inputs = pd.read_csv(train_file, header=None)
+    print(train_inputs)
+
     return train_inputs, train_outputs, test_inputs, test_outputs
 
 def init_centroids_classification(train_inputs, train_outputs, num_rbf):
