@@ -9,13 +9,18 @@ IMC: lab assignment 3
 @author: Ventura Lucena Martínez
 """
 
+from math import dist
 import pickle
 import os
 import click
 import numpy as np
 import pandas as pd
+from sklearn.metrics import mean_squared_error
+from scipy.spatial.distance import pdist
 from sklearn.model_selection import train_test_split
 from sklearn.cluster import KMeans
+from sklearn.linear_model import LogisticRegression
+from scipy.spatial.distance import squareform
 
 
 @click.command()
@@ -50,6 +55,9 @@ def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, o
         if train_file is None:
             print("You have not specified the training file (-t)")
             return
+
+        if test_file is None:
+            test_file = train_file
 
         train_mses = np.empty(5)
         train_ccrs = np.empty(5)
@@ -154,7 +162,7 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
                                                                        outputs)
 
     # [x] TODO: Obtain num_rbf from ratio_rbf
-    num_rbf = ratio_rbf * len(train_inputs)
+    num_rbf = int(ratio_rbf * len(train_inputs))
 
     print("Number of RBFs used: %d" % (num_rbf))
     kmeans, distances, centers = clustering(classification, train_inputs,
@@ -170,9 +178,10 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
         logreg = logreg_classification(r_matrix, train_outputs, l2, eta)
 
     """
-    TODO: Obtain the distances from the centroids to the test patterns
+    [x] TODO: Obtain the distances from the centroids to the test patterns
           and obtain the R matrix for the test set
     """
+    r_matrix_test = calculate_r_matrix(kmeans.transform(test_inputs), radii)
 
     # # # # KAGGLE # # # #
     if model_file != "":
@@ -197,15 +206,39 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
 
     if not classification:
         """
-        TODO: Obtain the predictions for training and test and calculate
+        [x] TODO: Obtain the predictions for training and test and calculate
               the MSE
         """
+        prediction_train = np.matmul(r_matrix, coefficients)
+        prediction_test = np.matmul(r_matrix_test, coefficients)
+
+        train_mse = mean_squared_error(prediction_train, train_outputs)
+        test_mse = mean_squared_error(prediction_test, test_outputs)
+
+        train_ccr = 0
+        test_ccr = 0
     else:
         """
-        TODO: Obtain the predictions for training and test and calculate
+        [] TODO: Obtain the predictions for training and test and calculate
               the CCR. Obtain also the MSE, but comparing the obtained
               probabilities and the target probabilities
         """
+        from sklearn.preprocessing import OneHotEncoder
+        log_b = OneHotEncoder()
+        train_binary_outputs = log_b.fit_transform(train_outputs).toarray()
+        test_binary_outputs = log_b.fit_transform(test_outputs).toarray()
+
+        train_ccr = logreg.score(r_matrix, train_outputs) * 100
+        test_ccr = logreg.score(r_matrix_test, test_outputs) * 100
+
+        train_mse = mean_squared_error(
+            train_binary_outputs, logreg.predict_proba(r_matrix))
+        test_mse = mean_squared_error(
+            test_binary_outputs, logreg.predict_proba(r_matrix_test))
+
+        predict = logreg.predict(r_matrix_test)
+        #cm = confusion_matrix(test_outputs, predict)
+        # print(cm)
 
     return train_mse, test_mse, train_ccr, test_ccr
 
@@ -344,9 +377,14 @@ def calculate_radii(centers, num_rbf):
             Array with the radius of each RBF
     """
 
-    # TODO: Complete the code of the function
-    # euclidean_pdist().
-    # for instance np.mean( M[:,0])
+    # [x] TODO: Complete the code of the function
+    radii = np.array([])
+    distances = pdist(centers)
+    distances = squareform(distances)
+
+    for i in range(num_rbf):
+        radii = np.append(radii, sum(distances[i] / (2 * (num_rbf - 1))))
+
     return radii
 
 
@@ -370,7 +408,16 @@ def calculate_r_matrix(distances, radii):
             we include a last column with ones, which is going to act as bias
     """
 
-    # TODO: Complete the code of the function
+    # [] TODO: Complete the code of the function
+    r_matrix = np.power(distances, 2)
+
+    for i in range(r_matrix.shape[1]):
+        r_matrix[:, i] /= (-2 * np.power(radii[i], 2))
+
+    r_matrix = np.exp(r_matrix)
+    ones = np.ones((r_matrix.shape[0], 1))
+    r_matrix = np.hstack((r_matrix, ones))
+
     return r_matrix
 
 
@@ -395,11 +442,14 @@ def invert_matrix_regression(r_matrix, train_outputs):
             of the bias 
     """
 
-    # TODO: Complete the code of the function
+    # [x] TODO: Complete the code of the function
+    pseudo_inverse = np.linalg.pinv(r_matrix)
+    coefficients = np.matmul(pseudo_inverse, train_outputs)
+
     return coefficients
 
 
-def logreg_classification(matriz_r, train_outputs, l2, eta):
+def logreg_classification(r_matrix, train_outputs, l2, eta):
     """ Performs logistic regression training for the classification case
         It trains a logistic regression object to perform classification based
         on the R matrix (activations of the RBFs together with the bias)
@@ -423,7 +473,15 @@ def logreg_classification(matriz_r, train_outputs, l2, eta):
             Scikit-learn logistic regression model already trained
     """
 
-    # TODO: Complete the code of the function
+    # [x] TODO: Complete the code of the function
+    if l2:
+        logreg = LogisticRegression(C=(1 / eta), solver='liblinear')
+    else:
+        logreg = LogisticRegression(
+            penalty='l1', C=(1 / eta), solver='liblinear')
+
+    logreg.fit(r_matrix, train_outputs.ravel())
+
     return logreg
 
 
