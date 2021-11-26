@@ -32,7 +32,7 @@ from scipy.spatial.distance import squareform
               help=u'Boolean that indicates wether it is a classification problem or not.')
 @click.option('--ratio_rbf', '-r', default=0.1, show_default=True, required=False,
               help=u'Indicates the radius (by one) of RBF neurons with respect to the total number of patterns in training.')
-@click.option('--l2', '-l', default=None, required=False,
+@click.option('--l2', '-l', default=False, required=False,
               help=u'Boolean that indicates if L2 regularization is used. If it is not specified, L1 will be used.')
 @click.option('--eta', '-e', default=1e-2, show_default=True, required=False,
               help=u'Indicates the value for eta (η) parameter.')
@@ -215,8 +215,8 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
         train_mse = mean_squared_error(prediction_train, train_outputs)
         test_mse = mean_squared_error(prediction_test, test_outputs)
 
-        train_ccr = 0
-        test_ccr = 0
+        train_ccr = 0.0
+        test_ccr = 0.0
     else:
         """
         [] TODO: Obtain the predictions for training and test and calculate
@@ -228,13 +228,13 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
         train_binary_outputs = log_b.fit_transform(train_outputs).toarray()
         test_binary_outputs = log_b.fit_transform(test_outputs).toarray()
 
-        train_ccr = logreg.score(r_matrix, train_outputs) * 100
-        test_ccr = logreg.score(r_matrix_test, test_outputs) * 100
-
         train_mse = mean_squared_error(
             train_binary_outputs, logreg.predict_proba(r_matrix))
         test_mse = mean_squared_error(
             test_binary_outputs, logreg.predict_proba(r_matrix_test))
+
+        train_ccr = logreg.score(r_matrix, train_outputs) * 100
+        test_ccr = logreg.score(r_matrix_test, test_outputs) * 100
 
         predict = logreg.predict(r_matrix_test)
         #cm = confusion_matrix(test_outputs, predict)
@@ -408,15 +408,15 @@ def calculate_r_matrix(distances, radii):
             we include a last column with ones, which is going to act as bias
     """
 
-    # [] TODO: Complete the code of the function
-    r_matrix = np.power(distances, 2)
+    # [x] TODO: Complete the code of the function
+    net = np.power(distances, 2)
 
-    for i in range(r_matrix.shape[1]):
-        r_matrix[:, i] /= (-2 * np.power(radii[i], 2))
+    for i in range(net.shape[1]):
+        net[:, i] = np.exp( -net[:, i] / (2 * np.power(radii[i], 2)))
 
-    r_matrix = np.exp(r_matrix)
-    ones = np.ones((r_matrix.shape[0], 1))
-    r_matrix = np.hstack((r_matrix, ones))
+    out = net
+    ones = np.ones((out.shape[0], 1))
+    r_matrix = np.hstack((out, ones))
 
     return r_matrix
 
