@@ -23,6 +23,7 @@ from sklearn.linear_model import LogisticRegression
 from scipy.spatial.distance import squareform
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import confusion_matrix
+import time
 
 
 @click.command()
@@ -34,7 +35,7 @@ from sklearn.metrics import confusion_matrix
               help=u'Boolean that indicates wether it is a classification problem or not.')
 @click.option('--ratio_rbf', '-r', default=0.1, show_default=True, required=False,
               help=u'Indicates the radius (by one) of RBF neurons with respect to the total number of patterns in training.')
-@click.option('--l2', '-l', default=False, required=False,
+@click.option('--l2', '-l', is_flag=True, default=False, show_default=True, required=False,
               help=u'Boolean that indicates if L2 regularization is used. If it is not specified, L1 will be used.')
 @click.option('--eta', '-e', default=1e-2, show_default=True, required=False,
               help=u'Indicates the value for eta (η) parameter.')
@@ -50,6 +51,7 @@ def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, o
         RBF neural network based on hybrid supervised/unsupervised training.
         We run 5 executions with different seeds.
     """
+    start = time.time()
 
     if not pred:
 
@@ -111,6 +113,9 @@ def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, o
                 s += ",{}".format(int(prediction))
 
             print(s)
+
+    end = time.time()
+    print("\nTime (s) = ", end - start)
 
 
 def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model_file=""):
