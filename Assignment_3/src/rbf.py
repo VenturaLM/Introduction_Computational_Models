@@ -7,9 +7,9 @@ IMC: lab assignment 3
 
 @author: pagutierrez
 @author: Ventura Lucena Martínez
+    References: https://towardsdatascience.com/logistic-regression-using-python-sklearn-numpy-mnist-handwriting-recognition-matplotlib-a6b31e2b166a
 """
 
-from math import dist
 import pickle
 import os
 import click
@@ -21,6 +21,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LogisticRegression
 from scipy.spatial.distance import squareform
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import confusion_matrix
 
 
 @click.command()
@@ -42,7 +44,6 @@ from scipy.spatial.distance import squareform
               help=u'Use the prediction mode.')  # KAGGLE
 @click.option('--model', '-m', default="", show_default=False,
               help=u'Directory name to save the models (or name of the file to load the model, if the prediction mode is active).')  # KAGGLE
-# eta = C in scikit-learn documentation of logisticregression.
 def train_rbf_total(train_file, test_file, classification, ratio_rbf, l2, eta, outputs, model, pred):
     """ 5 executions of RBFNN training
 
@@ -209,36 +210,36 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
         [x] TODO: Obtain the predictions for training and test and calculate
               the MSE
         """
-        prediction_train = np.matmul(r_matrix, coefficients)
-        prediction_test = np.matmul(r_matrix_test, coefficients)
+        train_prediction = np.matmul(r_matrix, coefficients)
+        test_prediction = np.matmul(r_matrix_test, coefficients)
 
-        train_mse = mean_squared_error(prediction_train, train_outputs)
-        test_mse = mean_squared_error(prediction_test, test_outputs)
+        train_mse = mean_squared_error(train_prediction, train_outputs)
+        test_mse = mean_squared_error(test_prediction, test_outputs)
 
         train_ccr = 0.0
         test_ccr = 0.0
     else:
         """
-        [] TODO: Obtain the predictions for training and test and calculate
+        [x] TODO: Obtain the predictions for training and test and calculate
               the CCR. Obtain also the MSE, but comparing the obtained
               probabilities and the target probabilities
         """
-        from sklearn.preprocessing import OneHotEncoder
-        log_b = OneHotEncoder()
-        train_binary_outputs = log_b.fit_transform(train_outputs).toarray()
-        test_binary_outputs = log_b.fit_transform(test_outputs).toarray()
+        test_predictions = logreg.predict(r_matrix_test)
+
+        tr_predictions = logreg.predict_proba(r_matrix)
+        te_predictions = logreg.predict_proba(r_matrix_test)
 
         train_mse = mean_squared_error(
-            train_binary_outputs, logreg.predict_proba(r_matrix))
+            tr_predictions, OneHotEncoder().fit_transform(train_outputs).toarray())
         test_mse = mean_squared_error(
-            test_binary_outputs, logreg.predict_proba(r_matrix_test))
+            te_predictions, OneHotEncoder().fit_transform(test_outputs).toarray())
 
         train_ccr = logreg.score(r_matrix, train_outputs) * 100
         test_ccr = logreg.score(r_matrix_test, test_outputs) * 100
 
-        predict = logreg.predict(r_matrix_test)
-        #cm = confusion_matrix(test_outputs, predict)
-        # print(cm)
+        print("\nConfusion matrix")
+        print(confusion_matrix(test_outputs, test_predictions))
+        print()
 
     return train_mse, test_mse, train_ccr, test_ccr
 
@@ -278,10 +279,10 @@ def read_data(train_file, test_file, outputs):
     test_np = test_df.to_numpy()
 
     train_inputs = train_np[:, 0:-outputs]
-    train_outputs = train_np[:, train_inputs.shape[1]]
+    train_outputs = train_np[:, train_inputs.shape[1]:]
 
     test_inputs = test_np[:, 0:-outputs]
-    test_outputs = test_np[:, test_inputs.shape[1]]
+    test_outputs = test_np[:, test_inputs.shape[1]:]
 
     return train_inputs, train_outputs, test_inputs, test_outputs
 
@@ -379,8 +380,7 @@ def calculate_radii(centers, num_rbf):
 
     # [x] TODO: Complete the code of the function
     radii = np.array([])
-    distances = pdist(centers)
-    distances = squareform(distances)
+    distances = squareform(pdist(centers))
 
     for i in range(num_rbf):
         radii = np.append(radii, sum(distances[i] / (2 * (num_rbf - 1))))
@@ -412,7 +412,7 @@ def calculate_r_matrix(distances, radii):
     net = np.power(distances, 2)
 
     for i in range(net.shape[1]):
-        net[:, i] = np.exp( -net[:, i] / (2 * np.power(radii[i], 2)))
+        net[:, i] = np.exp(-net[:, i] / (2 * np.power(radii[i], 2)))
 
     out = net
     ones = np.ones((out.shape[0], 1))
