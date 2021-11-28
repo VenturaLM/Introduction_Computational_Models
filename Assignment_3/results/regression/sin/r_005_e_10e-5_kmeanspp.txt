@@ -1,0 +1,49 @@
+-----------
+Seed: 1
+-----------
+Number of RBFs used: 6
+Training MSE: 0.013705
+Test MSE: 0.022036
+Training CCR: 0.00%
+Test CCR: 0.00%
+-----------
+Seed: 2
+-----------
+Number of RBFs used: 6
+Training MSE: 0.013966
+Test MSE: 0.022685
+Training CCR: 0.00%
+Test CCR: 0.00%
+-----------
+Seed: 3
+-----------
+Number of RBFs used: 6
+Training MSE: 0.013793
+Test MSE: 0.022293
+Training CCR: 0.00%
+Test CCR: 0.00%
+-----------
+Seed: 4
+-----------
+Number of RBFs used: 6
+Training MSE: 0.013868
+Test MSE: 0.022564
+Training CCR: 0.00%
+Test CCR: 0.00%
+-----------
+Seed: 5
+-----------
+Number of RBFs used: 6
+Training MSE: 0.013668
+Test MSE: 0.021927
+Training CCR: 0.00%
+Test CCR: 0.00%
+******************
+Summary of results
+******************
+Training MSE: 0.013800 +- 0.000108
+Test MSE: 0.022301 +- 0.000292
+Training CCR: 0.00% +- 0.00%
+Test CCR: 0.00% +- 0.00%
+
+Time (s) =  0.05713152885437012

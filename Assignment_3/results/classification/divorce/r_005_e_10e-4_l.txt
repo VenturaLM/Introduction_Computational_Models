@@ -1,0 +1,74 @@
+-----------
+Seed: 1
+-----------
+Number of RBFs used: 6
+
+Confusion matrix
+[[22  0]
+ [ 0 21]]
+
+Training MSE: 0.000004
+Test MSE: 0.000006
+Training CCR: 100.00%
+Test CCR: 100.00%
+-----------
+Seed: 2
+-----------
+Number of RBFs used: 6
+
+Confusion matrix
+[[22  0]
+ [ 0 21]]
+
+Training MSE: 0.000008
+Test MSE: 0.000001
+Training CCR: 100.00%
+Test CCR: 100.00%
+-----------
+Seed: 3
+-----------
+Number of RBFs used: 6
+
+Confusion matrix
+[[22  0]
+ [ 0 21]]
+
+Training MSE: 0.000009
+Test MSE: 0.000317
+Training CCR: 100.00%
+Test CCR: 100.00%
+-----------
+Seed: 4
+-----------
+Number of RBFs used: 6
+
+Confusion matrix
+[[22  0]
+ [ 0 21]]
+
+Training MSE: 0.000001
+Test MSE: 0.000015
+Training CCR: 100.00%
+Test CCR: 100.00%
+-----------
+Seed: 5
+-----------
+Number of RBFs used: 6
+
+Confusion matrix
+[[22  0]
+ [ 0 21]]
+
+Training MSE: 0.000020
+Test MSE: 0.000006
+Training CCR: 100.00%
+Test CCR: 100.00%
+******************
+Summary of results
+******************
+Training MSE: 0.000009 +- 0.000007
+Test MSE: 0.000069 +- 0.000124
+Training CCR: 100.00% +- 0.00%
+Test CCR: 100.00% +- 0.00%
+
+Time (s) =  0.13800668716430664
