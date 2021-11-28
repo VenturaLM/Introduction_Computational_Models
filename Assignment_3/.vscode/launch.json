@@ -12,9 +12,9 @@
             "console": "integratedTerminal",
             "args": [
                 "-t",
-                "datasets/csv/train_sin.csv",
+                "datasets/csv/train_divorce.csv",
                 "-T",
-                "datasets/csv/test_sin.csv",
+                "datasets/csv/test_divorce.csv",
                 "-r",
                 "0.05",
                 "-e",
