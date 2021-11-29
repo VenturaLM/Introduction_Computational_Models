@@ -221,8 +221,11 @@ def train_rbf(train_file, test_file, classification, ratio_rbf, l2, eta, outputs
         train_mse = mean_squared_error(train_prediction, train_outputs)
         test_mse = mean_squared_error(test_prediction, test_outputs)
 
-        train_ccr = 0.0
-        test_ccr = 0.0
+        train_ccr = 0
+        test_ccr = 0
+        # Experiment 4:
+        #train_ccr = int(np.mean(train_prediction))
+        #test_ccr = int(np.mean(test_prediction))
     else:
         """
         [x] TODO: Obtain the predictions for training and test and calculate
