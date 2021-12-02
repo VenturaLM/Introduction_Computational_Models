@@ -6,6 +6,9 @@ Created on Mon Nov 23 10:14:36 2017
 @author: pedroa
 """
 
+# For c
+#   For gamma
+#       Run k-Fold
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -18,7 +21,7 @@ X = data.iloc[:,:-1].values
 y = data.iloc[:,-1].values
 
 # Train the SVM model
-svm_model = svm.SVC(kernel='linear',C=1000)
+svm_model = svm.SVC(kernel='linear',C=1000) # Maybe include gamma parameter.
 svm_model.fit(X, y)
 
 # Plot the points
