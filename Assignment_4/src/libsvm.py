@@ -15,7 +15,7 @@ from sklearn import svm
 
 
 @click.command()
-@click.option('--dataset', '-d', default='../datasets/dat/dataset1.csv', required=True, help=u'Dataset file name.')
+@click.option('--dataset', '-d', default='../datasets/csv/dataset1.csv', required=True, help=u'Dataset file name.')
 def main(dataset):
     # Load the dataset.
     data = pd.read_csv(dataset, header=None)
