@@ -51,7 +51,7 @@ def main(dataset):
 
     # |-> Plot the results in a countour.
     Z = Z.reshape(XX.shape)
-    plt.pcolormesh(XX, YY, Z > 0)
+    plt.pcolormesh(XX, YY, Z > 0, shading='auto')
     plt.contour(XX, YY, Z, colors=['k', 'k', 'k'],
                 linestyles=['--', '-', '--'], levels=[-1, 0, 1])
 
